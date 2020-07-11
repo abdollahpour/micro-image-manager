@@ -1,0 +1,25 @@
+sudo: false
+
+language: node_js
+
+node_js:
+  - 14
+
+services:
+  - mongodb
+
+cache:  
+  directories:
+    - "node_modules"
+  yarn: true
+
+before_script:
+  # To accept connection by Mongo
+  - sleep 15
+  
+script:
+  - npm run lint
+  - npm run test:coveralls
+
+notifications:
+  email: false
