@@ -22,7 +22,8 @@ class Db {
 
     /**
      * @param {{
-     * image: string, 
+     * image: string,
+     * name: stirng, 
      * format: string, 
      * formatPriority: number,
      * profile: {width: number, height: number, name: string}
@@ -36,6 +37,7 @@ class Db {
 
             await this.images.insertOne({
                 id,
+                name: record.name,
                 data: Binary(buffer),
                 created: new Date(),
                 format: record.format,
@@ -60,8 +62,8 @@ class Db {
      */
     async find(query) {
         const q = {
-            id: query.id,
-            format: {$in: query.formats}
+            $or: [{ id: query.id }, { name: query.id }],
+            format: { $in: query.formats }
         }
         if (query.profile) q.profile = query.profile
         const sort = {
