@@ -25,7 +25,7 @@ jobs:
       script:
         - npm run prepublish
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - docker build -t "$DOCKER_USERNAME/$DOCKER_IMAGEE:$TRAVIS_COMMIT" -f .travis-dockerfile .
+        - docker build -t "$DOCKER_USERNAME/$DOCKER_IMAGE:$TRAVIS_COMMIT" .
         - docker push "$DOCKER_USERNAME/$DOCKER_IMAGE:$TRAVIS_COMMIT"
 
 stages:
