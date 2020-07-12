@@ -10,8 +10,8 @@ describe('test image utility', () => {
                     accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
                 }
             })).toEqual({
-                image: 'name.jpeg',
-                formats: ['webp', 'jpeg', 'png']
+                image: 'name',
+                formats: ['jpeg', 'webp', 'png']
             });
 
             // Without webp
@@ -21,7 +21,7 @@ describe('test image utility', () => {
                     accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
                 }
             })).toEqual({
-                image: 'name.jpeg',
+                image: 'name',
                 formats: ['jpeg', 'png']
             });
         });
