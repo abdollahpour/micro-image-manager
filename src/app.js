@@ -5,7 +5,7 @@ const addImage = require('./handler/add-image');
 const Db = require('./service/db');
 
 const mongodbUrl = process.env['MONGO_URL'] ?? 'mongodb://localhost:27017/image-manager';
-const httpPort = process.env['HTTP_PORT'] ?? 8080;
+const httpPort = process.env['HTTP_PORT'] ?? 8700;
 
 const requestListener = (db) => 
     async (req, res) => {
