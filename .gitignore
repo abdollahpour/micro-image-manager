@@ -1,6 +1,7 @@
 .*
 !.gitignore
 !.travis.yml
+!.travis-dockerfile
 !.eslintrc
 !.npmignore
 !.babelrc

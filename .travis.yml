@@ -1,3 +1,4 @@
+dist: trusty
 sudo: false
 
 language: node_js
@@ -8,18 +9,31 @@ node_js:
 services:
   - mongodb
 
-cache:  
-  directories:
-    - "node_modules"
-  yarn: true
+jobs:
+  fast_finish: true
+  include:
+    - stage: install
+      script:
+        - npm install
+    - stage: check
+      script:
+        - npm run lint
+    - stage: test
+      script:
+        - npm run test:coveralls
+    - stage: deploy
+      script:
+        - npm run prepublish
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker build -t "$DOCKER_USERNAME/$DOCKER_IMAGEE:$TRAVIS_COMMIT" -f .travis-dockerfile .
+        - docker push "$DOCKER_USERNAME/$DOCKER_IMAGE:$TRAVIS_COMMIT"
 
-before_script:
-  # To accept connection by Mongo
-  - sleep 15
-  
-script:
-  - npm run lint
-  - npm run test:coveralls
+stages:
+  - install
+  - check
+  - test
+  - deploy
 
+cache: npm
 notifications:
-  email: false
+  email: true
