@@ -1,6 +1,6 @@
 const { MongoClient, ObjectId } = require('mongodb');
 const { ObjectID, Binary } = require('mongodb');
-const { resizeImage } = require('../util/image-util');
+const { retryPromise } = require('../util/promise-util');
 const fs = require('fs').promises;
 
 class Db {
@@ -10,7 +10,11 @@ class Db {
     }
 
     async connect() {
-        this.client = await MongoClient.connect(this.mongodbUrl);
+        this.client = await retryPromise(
+            () => MongoClient.connect(this.mongodbUrl),
+            3000,
+            10
+        );
         this.db = this.client.db();
         this.images = this.db.collection('images');
         return this;
