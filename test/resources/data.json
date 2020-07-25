@@ -1,0 +1,15 @@
+{
+    "records": [
+        {
+            "image": "1280x1080.png",
+            "name": "sample_image",
+            "profiles": [
+                {
+                    "width": 1280,
+                    "height": 1080,
+                    "name": "large"
+                }
+            ]
+        }
+    ]
+}

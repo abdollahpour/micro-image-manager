@@ -10,18 +10,18 @@ describe('test image utility', () => {
                     accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
                 }
             })).toEqual({
-                image: 'name',
+                name: 'name',
                 formats: ['jpeg', 'webp', 'png']
             });
 
             // Without webp
             expect(identifyImage({
-                url: '/image/name.jpeg',
+                url: '/image/560c24b853b558856ef193a3.jpeg',
                 headers: {
                     accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
                 }
             })).toEqual({
-                image: 'name',
+                id: '560c24b853b558856ef193a3',
                 formats: ['jpeg', 'png']
             });
         });

@@ -13,11 +13,14 @@ const identifyImage = (req) => {
         const formatInName = results[3];
         const formatInHeader = webpSupported(req);
         const formatDefaults = ['jpeg', 'png'];
-        const formats =  [...new Set(
+        const formats = [...new Set(
             [].concat.apply([], [formatInQuery, formatInName, formatInHeader, formatDefaults]).filter(i => i)
         )];
         const profile = query.profile;
-        return { image: results[1], profile, formats };
+        const idOrName = results[1];
+        const id = idOrName.match('[a-zA-Z0-9]{24}') ? idOrName : undefined;
+        const name = !idOrName.match('[a-zA-Z0-9]{24}') ? idOrName : undefined;
+        return { id, name, profile, formats };
     }
     throw Error(`Illegal path: ${req.url}`);
 }

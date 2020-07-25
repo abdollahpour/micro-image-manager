@@ -1,13 +1,13 @@
 const http = require('http');
-const { promisify } = require('util');
 const getImage = require('./handler/get-image');
 const addImage = require('./handler/add-image');
 const Db = require('./service/db');
+const { initData } = require('./util/init-util');
 
 const mongodbUrl = process.env['MONGO_URL'] ?? 'mongodb://localhost:27017/image-manager';
 const httpPort = process.env['HTTP_PORT'] ?? 8700;
 
-const requestListener = (db) => 
+const requestListener = (db) =>
     async (req, res) => {
         if (/\/image\/[0-9a-z_]+/.test(req.url)) {
             getImage(req, res, db);
@@ -24,7 +24,9 @@ const requestListener = (db) =>
 
 const main = async () => {
     const db = new Db(mongodbUrl);
-    const server = http.createServer(requestListener(await db.connect()));
+    const connectedDb = await db.connect();
+    await initData(connectedDb);
+    const server = http.createServer(requestListener(connectedDb));
     await server.listen(httpPort)
     console.log(`Server ready at ${httpPort}`);
 }

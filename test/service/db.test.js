@@ -8,7 +8,7 @@ describe('test db service', () => {
 
     describe('add image', () => {
         test('given image file and profiles should add images to database', async () => {
-            const id = await db.add([{
+            const id = await db.add('some image', [{
                 image: `${__dirname}/../resources/1280x1080.png`,
                 format: 'png',
                 formatPriority: 1,
@@ -24,7 +24,7 @@ describe('test db service', () => {
 
     describe('get image', () => {
         test('given query should find the image', async () => {
-            const id = await db.add([{
+            const id = await db.add('some image', [{
                 image: `${__dirname}/../resources/1280x1080.png`,
                 format: 'png',
                 formatPriority: 1,

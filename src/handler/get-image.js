@@ -3,8 +3,8 @@ const { identifyImage } = require('../util/http-util');
 const { ObjectID } = require('mongodb');
 
 module.exports = async (req, res, db) => {
-    const { image, profile, formats } = identifyImage(req)
-    const loaded = await db.find({ id: ObjectID(image), profile, formats });
+    const { id, name, profile, formats } = identifyImage(req)
+    const loaded = await db.find({ id, name, profile, formats });
 
     if (loaded) {
         res.writeHead(200, {'Content-Type': `image/${loaded.format}` });

@@ -33,7 +33,7 @@ class Db {
      * profile: {width: number, height: number, name: string}
      * }} records 
      */
-    async add(records) {
+    async add(name, records) {
         const id = ObjectID();
 
         for (let record of records) {
@@ -41,7 +41,7 @@ class Db {
 
             await this.images.insertOne({
                 id,
-                name: record.name,
+                name: name,
                 data: Binary(buffer),
                 created: new Date(),
                 format: record.format,
@@ -52,6 +52,9 @@ class Db {
                 size: 35958
             });
         }
+
+        // remove old records
+        await this.images.deleteMany({ name, id: { $ne: id } });
 
         return id;
     }
@@ -66,10 +69,11 @@ class Db {
      */
     async find(query) {
         const q = {
-            $or: [{ id: query.id }, { name: query.id }],
             format: { $in: query.formats }
         }
-        if (query.profile) q.profile = query.profile
+        if (query.id) q.id = ObjectID(query.id);
+        if (query.name) q.name = query.name;
+        if (query.profile) q.profile = query.profile;
         const sort = {
             width: -1,
             heigh: -1,

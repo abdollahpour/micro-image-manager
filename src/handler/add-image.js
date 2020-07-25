@@ -1,11 +1,26 @@
 const sharp = require('sharp')
 const { parseForm } = require('../util/form-util');
 const { loadProfiles, validateProfiles } = require('../util/size-util');
-const { resizeImage, suggestConvertingFormats } = require('../util/image-util');
+const { buildImageRecords } = require('../util/image-util');
 
 module.exports = async (req, res, db) => {
     const [fields, files] = await parseForm(req);
     const profiles = loadProfiles(fields);
+    const name = fields.name;
+    if (!name) {
+        res.writeHead(400);
+        return res.end(JSON.stringify({
+            status: 400,
+            error: 'Name is required'
+        }));
+    }
+    if (name.match('[a-zA-Z0-9]{24}')) {
+        res.writeHead(400);
+        return res.end(JSON.stringify({
+            status: 400,
+            error: 'Name cannot be with mongodb ObjectID hex format'
+        }));
+    }
 
     if (Object.keys(files).length !== 1) {
         res.writeHead(400);
@@ -31,22 +46,8 @@ module.exports = async (req, res, db) => {
         }
     }
 
-    const records = [];
-    const suggestedFormats = await suggestConvertingFormats(imageFile);
-    for (let profile of profiles) {
-        for (let suggestedFormat of suggestedFormats) {
-            const resizedImage = await resizeImage(imageFile, profile, suggestedFormat.format, suggestedFormat.originalFormat);
-            records.push({
-                image: resizedImage,
-                profile,
-                format: suggestedFormat.format,
-                originalFormat: suggestedFormat.originalFormat,
-                formatPriority: suggestedFormat.formatPriority
-            });
-        }
-    }
-
-    const id = await db.add(records);
+    const records = await buildImageRecords(imageFile, profiles);
+    const id = await db.add(name, records);
 
     res.writeHead(200);
     res.end(JSON.stringify({
