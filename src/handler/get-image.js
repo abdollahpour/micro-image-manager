@@ -7,7 +7,10 @@ module.exports = async (req, res, db) => {
     const loaded = await db.find({ id, name, profile, formats });
 
     if (loaded) {
-        res.writeHead(200, {'Content-Type': `image/${loaded.format}` });
+        res.writeHead(200, {
+            'Content-Type': `image/${loaded.format}`,
+            'Cache-Control': 'max-age=31536000, immutable'
+        });
         res.end(loaded.data.buffer);
     } else {
         const notFound = profile ? `${__dirname}/../../assets/${profile}.png` : undefined;
