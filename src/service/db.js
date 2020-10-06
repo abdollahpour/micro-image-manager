@@ -11,7 +11,7 @@ class Db {
 
     async connect() {
         this.client = await retryPromise(
-            () => MongoClient.connect(this.mongodbUrl),
+            () => MongoClient.connect(this.mongodbUrl, { useUnifiedTopology: true }),
             3000,
             10
         );

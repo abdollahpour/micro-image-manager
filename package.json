@@ -1,6 +1,6 @@
 {
   "name": "micro-image-manager",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Manage images in your microservices",
   "main": "lib/app.js",
   "scripts": {
@@ -12,6 +12,7 @@
     "lint": "eslint '**/*.js'",
     "prepublish": "babel src --out-dir lib"
   },
+  "bin": "./lib/app.js",
   "repository": {
     "type": "git",
     "url": "https://github/abdollahpour/micro-image-manager"
