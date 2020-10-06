@@ -31,4 +31,4 @@ const main = async () => {
     console.log(`Server ready at ${httpPort}`);
 }
 
-main();
+main().catch(err => console.error(err))
