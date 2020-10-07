@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const http = require('http');
 const getImage = require('./handler/get-image');
 const addImage = require('./handler/add-image');
