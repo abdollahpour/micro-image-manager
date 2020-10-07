@@ -4,9 +4,9 @@
 
 # micro-image-manager
 
-One of the big challenges to manage media in microservices is to how distributed them, manage and optimize them without bringing whole new infostructure and complexity in your app.
+One of the biggest challenges to manage media in microservices is distributing them in the cluster. micro-image-manager help you to manage and optimize them without bringing the whole new info structure and complexity in your app.
 
-The solution is micro-image-manager. Simple, fast, and scalable solution to manage, distributed, and optimize your images. Some of the main features are:
+micro-image-manager is a simple, fast, and scalable solution to manage, distributed, and optimize your images. Some of the main features are:
 
 * Convert images to different formats and sizes for different target browser and mobile
 * Crop & resize images
@@ -17,8 +17,7 @@ The solution is micro-image-manager. Simple, fast, and scalable solution to mana
 micro-image-manager bring two endpoints:
 
 ## `/api/v1/images`
-Is the one the you use to manage images. You DON'T open this endpoint to public.
-You can simply post image to this endpoint:
+Is the one you use to manage images. You DON'T open this endpoint to the public. You can simply post image to this endpoint:
 
     curl -F profile_small=400x300 -F profile_large=800x600 -F image=@my_image.jpg http://localhost:8700/api/v1/images
 
@@ -43,19 +42,19 @@ This will return:
 and create images in two different size and two different formats for you (jpeg, webp).
 
 ## `/image/<IMAGE_ID>`
-It fetch the largest image with format that browser supports for you. For example it chrome it shows 800x600.webp.
+It fetches the biggest image with a format that the browser supports for you. For example, in chrome, it shows 800x600.webp.
 
-You can explicity put the format:
+You can explicitly set the format:
 
     /image/<IMAGE_ID>.jpeg
 
-Or size (profile):
+Or the size (profile):
 
     /image/<IMAGE_ID>.jpeg?profile=small
 
 
-# Use it with HTML5
-You can explicity check format support:
+## Use it with HTML5
+You can use HTML5 to check the format support:
 
     <picture>
         <source srcset="/image/5f4a459d28317a9f153c211d.webp" type="image/webp" />
@@ -63,8 +62,34 @@ You can explicity check format support:
         <img src="/image/5f4a459d28317a9f153c211d" alt="Alt Text!" />
     </picture>
 
-Or even optimize image for different screen sizes that can boost up performance on mobile phones:
+Or even optimize the image for different screen sizes that can boost up performance on mobile phones:
 
     <img src="/image/5f4a459d28317a9f153c211d?profile=small"
     srcset="/image/5f4a459d28317a9f153c211d?profile=large 800w"
     alt="Image description">
+
+# How to run it?
+
+## Use npm
+First, you need to have mongodb up and running then:
+
+    npx micro-image-manger
+
+If mongo has different configurations:
+
+    MONGO_URL=mongodb://user@pass:mongo-host:27017/image-manager npx micro-image-manger
+
+Application is ready on localhost:8700
+
+## Use docker
+
+    docker-compose up
+
+Application is ready on `localhost:8700`
+
+# Use helm for kubernetes
+
+    helm repo add micro-image-manager https://raw.githubusercontent.com/abdollahpour/micro-auth-request-chart/master/repository
+    helm install micro-auth-request
+
+For more information and customization please check the details [here](https://github.com/abdollahpour/micro-image-manager-chart).
