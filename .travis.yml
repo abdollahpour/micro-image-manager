@@ -9,7 +9,7 @@ services:
 env:
   global:
     - GOLANG_VERSION="${TRAVIS_GO_VERSION}"
-    - MIM_VERSION="${TRAVIS_TAG:development}"
+    - MIM_VERSION="${TRAVIS_TAG:-development}"
   matrix:
     - LIBVIPS=8.10.0
 
@@ -18,7 +18,7 @@ before_install:
   - docker pull abdollahpour/micro-image-manager:latest || true
 
 script:
-  - docker build --pull --cache-from abdollahpour/micro-image-manager:latest --build-arg GOLANG_VERSION="${GOLANG_VERSION%.x}" --build-arg LIBVIPS_VERSION="${LIBVIPS}" --build-arg MIM_VERSION="${MIM_VERSION}" --tag abdollahpour/micro-image-manager:${MIM_VERSION} --tag abdollahpour/micro-image-manager:latest .
+  - docker build --pull --cache-from abdollahpour/micro-image-manager:latest --build-arg GOLANG_VERSION="${GOLANG_VERSION%.x}" --build-arg LIBVIPS_VERSION="${LIBVIPS}" --build-arg MIM_VERSION="${MIM_VERSION}" --tag abdollahpour/micro-image-manager:${MIM_VERSION} --tag abdollahpour/micro-image-manager:latest -f docker/Dockerfile .
   - docker push abdollahpour/micro-image-manager:${MIM_VERSION}
   - docker push abdollahpour/micro-image-manager:latest
 
