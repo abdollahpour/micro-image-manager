@@ -1,11 +1,4 @@
 .*
 !.gitignore
 !.travis.yml
-!.dockerignore
-!.eslintrc
-!.npmignore
-!.babelrc
-/node_modules/
-/lib/
-/coverage/
-/init/
+cover.out

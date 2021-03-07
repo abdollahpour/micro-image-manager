@@ -1,6 +1,0 @@
-*.md
-!README*.md
-node_modules/
-.git/
-coverage/
-test/
