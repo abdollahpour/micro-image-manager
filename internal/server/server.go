@@ -23,6 +23,7 @@ type StoreHandlerResult struct {
 var (
 	keyRe   = regexp.MustCompile(`profile_([a-z]+)`)
 	valueRe = regexp.MustCompile(`([0-9]{1,4})x([0-9]{1,4})`)
+	imageRe = regexp.MustCompile(`/image/([0-9a-zA-Z]{32}).([a-zA-Z]{3,4})`)
 )
 
 func DecodeProfile(key string, value string) (*processor.Profile, error) {
@@ -97,7 +98,27 @@ func StoreHandler(imageProcessor processor.ImagePocessor, imageStorage storage.S
 		resultData, _ := json.Marshal(result)
 
 		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Cache-Control", "public, max-age=604800, immutable")
 		w.Write(resultData)
+	}
+}
+
+func FetchHandler(imageStorage storage.Storage) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		imageFounds := imageRe.FindStringSubmatch(r.URL.Path)
+		if len(imageFounds) == 3 {
+			id := imageFounds[1]
+			format := imageFounds[2]
+			profile := r.URL.Query().Get("profile")
+
+			filePath, err := imageStorage.Fetch(id, profile, format)
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			w.Header().Set("Cache-Control", "public, max-age=604800, immutable")
+			http.ServeFile(w, r, filePath)
+			return
+		}
+		http.NotFoundHandler().ServeHTTP(w, r)
 	}
 }

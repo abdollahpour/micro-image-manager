@@ -1,6 +1,7 @@
-ARG GOLANG_VERSION=1.14
+ARG GOLANG_VERSION=1.16
 FROM golang:${GOLANG_VERSION} as builder
 
+ARG MIM_VERSION=development
 ARG LIBVIPS_VERSION=8.10.0
 
 # Installs libvips + required libraries
@@ -37,15 +38,14 @@ COPY go.sum .
 
 RUN go mod download
 
-# Copy imaginary sources
-COPY . .
+COPY internal internal/
+COPY cmd cmd/
 
-# Compile
-RUN go build -a \
-    -o ${GOPATH}/bin/mim-server \
-    -ldflags="-s -w -h -X main.Version=${IMAGINARY_VERSION}" \
-    github.com/abdollahpour/micro-image-manager
-
+RUN GOOS=linux go build \
+  -a -installsuffix cgo \
+  -ldflags="-X 'main.Version=${MIM_VERSION}'" \
+  -o /usr/local/bin/mim-server cmd/server/main.go
+CMD sh
 
 FROM debian:buster-slim
 
@@ -59,7 +59,7 @@ LABEL maintainer="tomas@aparicio.me" \
       org.label-schema.version="${IMAGINARY_VERSION}"
 
 COPY --from=builder /usr/local/lib /usr/local/lib
-COPY --from=builder /go/bin/imaginary /usr/local/bin/imaginary
+COPY --from=builder /usr/local/bin/mim-server /usr/local/bin/mim-server
 COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 
 # Install runtime dependencies
@@ -75,14 +75,15 @@ RUN DEBIAN_FRONTEND=noninteractive \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Server port to listen
-ENV PORT 9000
 
-# Drop privileges for non-UID mapped environments
-USER nobody
+# Server port to listen
+ENV PORT 8080
+ENV MIM_DIST_DIR /mnt/images
+
+RUN mkdir -p /mnt/images
 
 # Run the entrypoint command by default when the container starts.
-ENTRYPOINT ["/usr/local/bin/imaginary"]
+ENTRYPOINT ["/usr/local/bin/mim-server"]
 
 # Expose the server TCP port
 EXPOSE ${PORT}
