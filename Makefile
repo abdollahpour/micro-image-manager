@@ -26,6 +26,9 @@ spec:
 	go test ./...
 
 # Since solving it without put it in docker is complex because of dependencies, we do it here manually
-coveralls:
+# 1) Make sure you have goverrals installed: go get github.com/mattn/goveralls
+# 2) gopath binaries are in path: export PATH=$PATH:$GOPATH/bin
+# 3) set coveralls token in your env: 
+goverrals:
 	go test -v -covermode=count -coverprofile=coverage.out ./...
-	$$HOME/go/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $(TOKEN)
+	goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $$COVERALLS_TOKEN
