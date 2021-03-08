@@ -1,4 +1,5 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/abdollahpour/micro-image-manager)
 [![Coverage Status](https://coveralls.io/repos/github/abdollahpour/micro-image-manager/badge.svg?branch=master)](https://coveralls.io/github/abdollahpour/micro-image-manager?branch=master)
 [![Build Status](https://secure.travis-ci.org/abdollahpour/micro-image-manager.svg?branch=master)](http://travis-ci.org/abdollahpour/micro-image-manager)
 

@@ -17,10 +17,15 @@ image:
 	docker build -t $(name) -f docker/Dockerfile . 
 
 test:
-	go test -coverprofile=cover.out -cover ./...
+	go test -coverprofile=coverage.out -cover ./...
 
 coverage: test
-	go tool cover -func cover.out
+	go tool cover -func coverage.out
 
 spec:
 	go test ./...
+
+# Since solving it without put it in docker is complex because of dependencies, we do it here manually
+coveralls:
+	go test -v -covermode=count -coverprofile=coverage.out ./...
+	$$HOME/go/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $(TOKEN)
