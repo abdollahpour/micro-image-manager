@@ -17,6 +17,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type mockImageProcessor struct{}
+
+func (m *mockImageProcessor) Process(id string, bytes []byte, profiles []processor.Profile) ([]processor.ProcessingResult, error) {
+	return nil, nil
+}
+
+type mockImageStorage struct{}
+
+func (m *mockImageStorage) Store(id string, profileName string, format string, data []byte) error {
+	return nil
+}
+
+func (m *mockImageStorage) Fetch(id string, profileName string, format string) (string, error) {
+	return "", nil
+}
+
 func TestStoreHandlerNoSupport404(t *testing.T) {
 	imageProcessor := processor.NewBimgProcessor(os.TempDir())
 	imageStorage := storage.NewLocalStorage(os.TempDir())
@@ -81,6 +97,17 @@ func TestStoreHandler(t *testing.T) {
 
 	assert.ElementsMatch(t, []processor.Format{processor.JPEG, processor.WEBP}, result.Formats)
 	assert.ElementsMatch(t, []processor.Profile{profileLarge, profileSmall}, result.Profiles)
+}
+
+func TestStoreHandlerPostNotMultipart(t *testing.T) {
+	req, err := http.NewRequest("POST", "/api/v1/images", strings.NewReader("data=value"))
+	assert.Nil(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(StoreHandler(&mockImageProcessor{}, &mockImageStorage{}))
+
+	handler.ServeHTTP(rr, req)
+	assert.Equal(t, http.StatusBadRequest, rr.Result().StatusCode)
 }
 
 func TestDecodeProfile(t *testing.T) {
