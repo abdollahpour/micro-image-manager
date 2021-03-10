@@ -108,6 +108,7 @@ func TestStoreHandlerPostNotMultipart(t *testing.T) {
 
 	handler.ServeHTTP(rr, req)
 	assert.Equal(t, http.StatusBadRequest, rr.Result().StatusCode)
+	assert.Equal(t, "{\"errors\":[{\"title\":\"Multipart error\",\"detail\":\"Error to parse multipart POST request.\",\"status\":\"400\",\"code\":\"REQ-100\",\"meta\":{\"spec\":\"https://tools.ietf.org/html/rfc2388\"}}]}\n", rr.Body.String())
 }
 
 func TestDecodeProfile(t *testing.T) {

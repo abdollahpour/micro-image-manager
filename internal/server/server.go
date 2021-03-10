@@ -11,7 +11,9 @@ import (
 
 	"github.com/abdollahpour/micro-image-manager/internal/processor"
 	"github.com/abdollahpour/micro-image-manager/internal/storage"
+	"github.com/google/jsonapi"
 	"github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
 )
 
 func JSONError(w http.ResponseWriter, err interface{}, code int) {
@@ -57,7 +59,15 @@ func StoreHandler(imageProcessor processor.ImagePocessor, imageStorage storage.S
 
 		err := r.ParseMultipartForm(32 << 20) // 32Mb
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			log.Warn("Request size if larger than 32Mb")
+			w.WriteHeader(http.StatusBadRequest)
+			jsonapi.MarshalErrors(w, []*jsonapi.ErrorObject{{
+				Title:  "Multipart error",
+				Detail: "Error to parse multipart POST request.",
+				Status: "400",
+				Code:   "REQ-100",
+				Meta:   &map[string]interface{}{"spec": "https://tools.ietf.org/html/rfc2388"},
+			}})
 			return
 		}
 
@@ -65,7 +75,15 @@ func StoreHandler(imageProcessor processor.ImagePocessor, imageStorage storage.S
 		for key, value := range r.Form {
 			profile, err := DecodeProfile(key, value[0])
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
+				log.WithField("key", key).WithField("value", value).Trace("Profile format error")
+				w.WriteHeader(http.StatusBadRequest)
+				jsonapi.MarshalErrors(w, []*jsonapi.ErrorObject{{
+					Title:  "Format error",
+					Detail: "Failed to parse profile.",
+					Status: "400",
+					Code:   "REQ-101",
+					Meta:   &map[string]interface{}{"profile": key, "value": value[0]},
+				}})
 				return
 			}
 			if profile != nil {
@@ -75,25 +93,56 @@ func StoreHandler(imageProcessor processor.ImagePocessor, imageStorage storage.S
 
 		file, _, err := r.FormFile("image")
 		if err != nil {
-			fmt.Println("Error Retrieving the File")
-			fmt.Println(err)
+			log.Trace("No image found")
+			w.WriteHeader(http.StatusBadRequest)
+			jsonapi.MarshalErrors(w, []*jsonapi.ErrorObject{{
+				Title:  "image not found",
+				Detail: "No image file found in the POST request",
+				Status: "400",
+				Code:   "REQ-102",
+			}})
 			return
 		}
 		defer file.Close()
 
 		fileBytes, err := ioutil.ReadAll(file)
 		if err != nil {
-			fmt.Println(err)
+			log.Error("Failed to read uploaded file")
+			w.WriteHeader(http.StatusInternalServerError)
+			jsonapi.MarshalErrors(w, []*jsonapi.ErrorObject{{
+				Title:  "Internal server error",
+				Status: "500",
+				Code:   "INT-100",
+			}})
+			return
 		}
 
 		id := uuid.NewString()
 
 		results, err := imageProcessor.Process(id, fileBytes, profiles)
 		for _, result := range results {
-			data, _ := ioutil.ReadFile(result.File)
+			log.Error("Error to process the image")
+			data, err := ioutil.ReadFile(result.File)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				jsonapi.MarshalErrors(w, []*jsonapi.ErrorObject{{
+					Title:  "Internal server error",
+					Status: "500",
+					Code:   "INT-101",
+				}})
+				return
+			}
+
 			err = imageStorage.Store(id, result.Profile.Name, result.Format.String(), data)
 			if err != nil {
-				fmt.Println(err)
+				log.Error("Error to store the image")
+				w.WriteHeader(http.StatusInternalServerError)
+				jsonapi.MarshalErrors(w, []*jsonapi.ErrorObject{{
+					Title:  "Internal server error",
+					Status: "500",
+					Code:   "INT-102",
+				}})
+				return
 			}
 		}
 
@@ -102,7 +151,17 @@ func StoreHandler(imageProcessor processor.ImagePocessor, imageStorage storage.S
 			Profiles: profiles,
 			Formats:  []processor.Format{processor.JPEG, processor.WEBP},
 		}
-		resultData, _ := json.Marshal(result)
+		resultData, err := json.Marshal(result)
+		if err != nil {
+			log.Error("Error to serialize the result")
+			w.WriteHeader(http.StatusInternalServerError)
+			jsonapi.MarshalErrors(w, []*jsonapi.ErrorObject{{
+				Title:  "Internal server error",
+				Status: "500",
+				Code:   "INT-103",
+			}})
+			return
+		}
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(resultData)

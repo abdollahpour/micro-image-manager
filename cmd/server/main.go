@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -11,17 +10,28 @@ import (
 	"github.com/abdollahpour/micro-image-manager/internal/processor"
 	"github.com/abdollahpour/micro-image-manager/internal/server"
 	"github.com/abdollahpour/micro-image-manager/internal/storage"
+	log "github.com/sirupsen/logrus"
 )
 
 var Version = "development"
 
+func init() {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.InfoLevel)
+}
+
 func main() {
-	version := flag.Bool("version", false, "micro-image-manager version")
+	version := flag.Bool("version", false, "print version version")
+	debug := flag.Bool("debug", false, "active debug manager")
 
 	flag.Parse()
 	if *version {
 		fmt.Println(Version)
 		os.Exit(0)
+	}
+	if *debug {
+		log.SetLevel(log.TraceLevel)
 	}
 
 	conf := config.NewEnvConfiguration()
