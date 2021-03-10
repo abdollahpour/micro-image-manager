@@ -12,7 +12,7 @@ micro-image-manager is a simple, fast, and scalable solution to manage, distribu
 * Convert images to different formats and sizes for different target browser and mobile
 * Crop & resize images
 * Optimize images (jpeg & webp)
-* Distributed images resources over your cluster using MongoDB replica
+* Distributed images using Persistance Storage
 
 # How to use it
 micro-image-manager bring two endpoints:
@@ -37,15 +37,14 @@ This will return:
                 "width": 800,
                 "height": 600
             }
-        ]
+        ],
+        "formats": ["jpeg", "webp"]
     }
 
 and create images in two different size and two different formats for you (jpeg, webp).
 
-## `/image/<IMAGE_ID>`
+## `/image/<IMAGE_ID>.<FORMAT>`
 It fetches the biggest image with a format that the browser supports for you. For example, in chrome, it shows 800x600.webp.
-
-You can explicitly set the format:
 
     /image/<IMAGE_ID>.jpeg
 
@@ -53,40 +52,34 @@ Or the size (profile):
 
     /image/<IMAGE_ID>.jpeg?profile=small
 
+If you put a profile that does not exist you will still get the largest image.
 
 ## Use it with HTML5
 You can use HTML5 to check the format support:
 
     <picture>
         <source srcset="/image/5f4a459d28317a9f153c211d.webp" type="image/webp" />
-        <source srcset="/image/5f4a459d28317a9f153c211d.jpeg"  type="image/jpeg" /> 
-        <img src="/image/5f4a459d28317a9f153c211d" alt="Alt Text!" />
+        <img src="/image/5f4a459d28317a9f153c211d.jpeg" alt="Alt Text!" />
     </picture>
 
 Or even optimize the image for different screen sizes that can boost up performance on mobile phones:
 
-    <img src="/image/5f4a459d28317a9f153c211d?profile=small"
-    srcset="/image/5f4a459d28317a9f153c211d?profile=large 800w"
+    <img src="/image/5f4a459d28317a9f153c211d.webp?profile=small"
+    srcset="/image/5f4a459d28317a9f153c211d.webp?profile=large 800w"
     alt="Image description">
+
+Please check HTML5 documentation for all possible combinations.
 
 # How to run it?
 
-## Use npm
-First, you need to have mongodb up and running then:
-
-    npx micro-image-manger
-
-If mongo has different configurations:
-
-    MONGO_URL=mongodb://user@pass:mongo-host:27017/image-manager npx micro-image-manger
-
-Application is ready on localhost:8700
+## Use binary
+Download binary from your system from releases and just run it!
 
 ## Use docker
 
-    docker-compose up
+    docker run -d -p 8080:8080 abdollahpour/micro-image-manager
 
-Application is ready on `localhost:8700`
+Application is ready on `localhost:8080`
 
 # Use helm for kubernetes
 
