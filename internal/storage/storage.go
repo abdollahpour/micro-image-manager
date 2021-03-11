@@ -1,7 +1,9 @@
 package storage
 
+import "github.com/abdollahpour/micro-image-manager/internal/model"
+
 // Storage images
 type Storage interface {
-	Store(id string, profileName string, format string, data []byte) error
-	Fetch(id string, profileName string, format string) (string, error)
+	Store(id string, profile model.Profile, format model.Format, data []byte) error
+	Fetch(id string, profile model.Profile, format model.Format) (string, error)
 }

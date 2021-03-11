@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/abdollahpour/micro-image-manager/internal/model"
 	"github.com/abdollahpour/micro-image-manager/internal/processor"
 	"github.com/abdollahpour/micro-image-manager/internal/storage"
 	"github.com/google/jsonapi"
@@ -25,24 +26,25 @@ func JSONError(w http.ResponseWriter, err interface{}, code int) {
 
 type StoreHandlerResult struct {
 	Id       string
-	Profiles []processor.Profile
-	Formats  []processor.Format
+	Profiles []model.Profile
+	Formats  []model.Format
 }
 
 var (
-	keyRe   = regexp.MustCompile(`profile_([a-z]+)`)
-	valueRe = regexp.MustCompile(`([0-9]{1,4})x([0-9]{1,4})`)
-	imageRe = regexp.MustCompile(`/image/([0-9a-zA-Z]{32}).([a-zA-Z]{3,4})`)
+	keyRe         = regexp.MustCompile(`profile_([a-z]+)`)
+	valueRe       = regexp.MustCompile(`([0-9]{1,4})x([0-9]{1,4})`)
+	profileNameRe = regexp.MustCompile(`[^a-z]`)
+	imageRe       = regexp.MustCompile(`/image/([0-9a-zA-Z]{32}).([a-zA-Z]{3,4})`)
 )
 
-func DecodeProfile(key string, value string) (*processor.Profile, error) {
+func DecodeProfile(key string, value string) (*model.Profile, error) {
 	keyFounds := keyRe.FindStringSubmatch(key)
 	if len(keyFounds) == 2 {
 		valueFounds := valueRe.FindStringSubmatch(value)
 		if len(valueFounds) == 3 {
 			width, _ := strconv.Atoi(valueFounds[1])
 			height, _ := strconv.Atoi(valueFounds[2])
-			return &processor.Profile{Name: keyFounds[1], Width: width, Height: height}, nil
+			return &model.Profile{Name: keyFounds[1], Width: width, Height: height}, nil
 		}
 		return nil, errors.New("Value format is not currect")
 	}
@@ -71,7 +73,7 @@ func StoreHandler(imageProcessor processor.ImagePocessor, imageStorage storage.S
 			return
 		}
 
-		var profiles []processor.Profile
+		var profiles []model.Profile
 		for key, value := range r.Form {
 			profile, err := DecodeProfile(key, value[0])
 			if err != nil {
@@ -133,7 +135,7 @@ func StoreHandler(imageProcessor processor.ImagePocessor, imageStorage storage.S
 				return
 			}
 
-			err = imageStorage.Store(id, result.Profile.Name, result.Format.String(), data)
+			err = imageStorage.Store(id, result.Profile, result.Format, data)
 			if err != nil {
 				log.Error("Error to store the image")
 				w.WriteHeader(http.StatusInternalServerError)
@@ -149,7 +151,7 @@ func StoreHandler(imageProcessor processor.ImagePocessor, imageStorage storage.S
 		result := StoreHandlerResult{
 			Id:       id,
 			Profiles: profiles,
-			Formats:  []processor.Format{processor.JPEG, processor.WEBP},
+			Formats:  []model.Format{model.JPEG, model.WEBP},
 		}
 		resultData, err := json.Marshal(result)
 		if err != nil {
@@ -174,9 +176,9 @@ func FetchHandler(imageStorage storage.Storage) func(w http.ResponseWriter, r *h
 		if len(imageFounds) == 3 {
 			id := imageFounds[1]
 			format := imageFounds[2]
-			profile := r.URL.Query().Get("profile")
+			profileName := profileNameRe.ReplaceAllString(r.URL.Query().Get("profile"), "")
 
-			filePath, err := imageStorage.Fetch(id, profile, format)
+			filePath, err := imageStorage.Fetch(id, model.NewProfile(profileName), model.NewFormat(format))
 			if err != nil {
 				fmt.Println(err)
 			}

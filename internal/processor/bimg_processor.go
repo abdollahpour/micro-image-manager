@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/abdollahpour/micro-image-manager/internal/model"
 	"github.com/h2non/bimg"
 )
 
@@ -33,7 +34,7 @@ func sourceTypeToTargetFormats(imageType string) ([]bimg.ImageType, error) {
 	}
 }
 
-func (p BimgProcessor) Process(id string, bytes []byte, profiles []Profile) ([]ProcessingResult, error) {
+func (p BimgProcessor) Process(id string, bytes []byte, profiles []model.Profile) ([]model.ProcessingResult, error) {
 	image := bimg.NewImage(bytes)
 	imageType := image.Type()
 	formats, err := sourceTypeToTargetFormats(imageType)
@@ -41,7 +42,7 @@ func (p BimgProcessor) Process(id string, bytes []byte, profiles []Profile) ([]P
 		return nil, err
 	}
 
-	results := make([]ProcessingResult, len(profiles)*len(formats))
+	results := make([]model.ProcessingResult, len(profiles)*len(formats))
 
 	for i, profile := range profiles {
 		resized, err := image.Resize(profile.Width, profile.Height)
@@ -58,10 +59,10 @@ func (p BimgProcessor) Process(id string, bytes []byte, profiles []Profile) ([]P
 			path := filepath.Join(p.tempDir, fmt.Sprintf("%s_%s.%v", id, profile.Name, bimg.ImageTypeName(format)))
 			bimg.Write(path, converted)
 
-			results[i*len(formats)+j] = ProcessingResult{
+			results[i*len(formats)+j] = model.ProcessingResult{
 				File:    path,
 				Profile: profile,
-				Format:  NewFormat(bimg.ImageTypeName(format)),
+				Format:  model.NewFormat(bimg.ImageTypeName(format)),
 			}
 		}
 	}

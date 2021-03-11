@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/abdollahpour/micro-image-manager/internal/model"
 	"github.com/abdollahpour/micro-image-manager/internal/processor"
 	"github.com/abdollahpour/micro-image-manager/internal/storage"
 	"github.com/stretchr/testify/assert"
@@ -19,17 +20,17 @@ import (
 
 type mockImageProcessor struct{}
 
-func (m *mockImageProcessor) Process(id string, bytes []byte, profiles []processor.Profile) ([]processor.ProcessingResult, error) {
+func (m *mockImageProcessor) Process(id string, bytes []byte, profiles []model.Profile) ([]model.ProcessingResult, error) {
 	return nil, nil
 }
 
 type mockImageStorage struct{}
 
-func (m *mockImageStorage) Store(id string, profileName string, format string, data []byte) error {
+func (m *mockImageStorage) Store(id string, profile model.Profile, format model.Format, data []byte) error {
 	return nil
 }
 
-func (m *mockImageStorage) Fetch(id string, profileName string, format string) (string, error) {
+func (m *mockImageStorage) Fetch(id string, profile model.Profile, format model.Format) (string, error) {
 	return "", nil
 }
 
@@ -60,12 +61,12 @@ func TestStoreHandler(t *testing.T) {
 	part, err := writer.CreateFormFile("image", "sample.jpg")
 	io.Copy(part, file)
 
-	profileLarge := processor.Profile{
+	profileLarge := model.Profile{
 		Name:   "large",
 		Width:  800,
 		Height: 600,
 	}
-	profileSmall := processor.Profile{
+	profileSmall := model.Profile{
 		Name:   "small",
 		Width:  400,
 		Height: 300,
@@ -95,8 +96,8 @@ func TestStoreHandler(t *testing.T) {
 	var result StoreHandlerResult
 	json.Unmarshal(rr.Body.Bytes(), &result)
 
-	assert.ElementsMatch(t, []processor.Format{processor.JPEG, processor.WEBP}, result.Formats)
-	assert.ElementsMatch(t, []processor.Profile{profileLarge, profileSmall}, result.Profiles)
+	assert.ElementsMatch(t, []model.Format{model.JPEG, model.WEBP}, result.Formats)
+	assert.ElementsMatch(t, []model.Profile{profileLarge, profileSmall}, result.Profiles)
 }
 
 func TestStoreHandlerPostNotMultipart(t *testing.T) {
@@ -121,6 +122,6 @@ func TestDecodeProfile(t *testing.T) {
 	assert.NotNil(t, err)
 
 	profile, err = DecodeProfile("profile_large", "800x600")
-	assert.Equal(t, &processor.Profile{Name: "large", Width: 800, Height: 600}, profile)
+	assert.Equal(t, &model.Profile{Name: "large", Width: 800, Height: 600}, profile)
 	assert.Nil(t, err)
 }
