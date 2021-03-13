@@ -78,9 +78,9 @@ RUN DEBIAN_FRONTEND=noninteractive \
 
 # Server port to listen
 ENV PORT 8080
-ENV MIM_DIST_DIR /mnt/images
+ENV MIM_DIST_DIR /var/lib/micro-image-manager/data
 
-RUN mkdir -p /mnt/images
+RUN mkdir -p /var/lib/micro-image-manager/data
 
 # Run the entrypoint command by default when the container starts.
 ENTRYPOINT ["/usr/local/bin/mim-server"]

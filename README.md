@@ -14,8 +14,12 @@ micro-image-manager is a simple, fast, and scalable solution to manage, distribu
 * Optimize images (jpeg & webp)
 * Distributed images using Persistance Storage
 
-# How to use it
-micro-image-manager bring two endpoints:
+# How to run micro-image manager
+You can use binary or docker image to run micro-image-manager locally or in your cloud provider:
+
+* Run from binaries
+* [Run using docker](docs/docker.md)
+* Setup on you kubernetes cluster using helm
 
 ## `/api/v1/images`
 Is the one you use to manage images. You DON'T open this endpoint to the public. You can simply post image to this endpoint:
