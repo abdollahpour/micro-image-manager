@@ -1,7 +1,6 @@
 package processor
 
 import (
-	"errors"
 	"fmt"
 	"path/filepath"
 
@@ -19,30 +18,51 @@ func NewBimgProcessor(tempDir string) *BimgProcessor {
 	}
 }
 
-func sourceTypeToTargetFormats(imageType string) ([]bimg.ImageType, error) {
+func toTargetImageTypes(format model.Format) ([]bimg.ImageType, error) {
 	switch {
-	case imageType == "jpeg":
+	case format == model.JPEG:
 		return []bimg.ImageType{bimg.JPEG, bimg.WEBP}, nil
-	case imageType == "png":
+	case format == model.PNG:
 		return []bimg.ImageType{bimg.PNG, bimg.WEBP}, nil
-	case imageType == "webp":
+	case format == model.WEBP:
 		return []bimg.ImageType{bimg.WEBP, bimg.JPEG}, nil
-	case imageType == "svg":
+	case format == model.SVG:
 		return []bimg.ImageType{bimg.SVG, bimg.WEBP, bimg.PNG}, nil
 	default:
-		return nil, errors.New("Format not supported: " + imageType)
+		return nil, fmt.Errorf("Format not supported: %v", format)
+	}
+}
+
+func toFormat(bimgFormat bimg.ImageType) (model.Format, error) {
+	switch {
+	case bimgFormat == bimg.JPEG:
+		return model.JPEG, nil
+	case bimgFormat == bimg.PNG:
+		return model.JPEG, nil
+	case bimgFormat == bimg.WEBP:
+		return model.JPEG, nil
+	case bimgFormat == bimg.SVG:
+		return model.JPEG, nil
+	default:
+		return model.NOT_SUPPORTED, fmt.Errorf("Format not supported: %v", bimgFormat)
 	}
 }
 
 func (p BimgProcessor) Process(id string, bytes []byte, profiles []model.Profile) ([]model.ProcessingResult, error) {
 	image := bimg.NewImage(bytes)
 	imageType := image.Type()
-	formats, err := sourceTypeToTargetFormats(imageType)
+
+	format, err := model.NewFormat(imageType)
 	if err != nil {
 		return nil, err
 	}
 
-	results := make([]model.ProcessingResult, len(profiles)*len(formats))
+	imageTypes, err := toTargetImageTypes(*format)
+	if err != nil {
+		return nil, err
+	}
+
+	results := make([]model.ProcessingResult, len(profiles)*len(imageTypes))
 
 	for i, profile := range profiles {
 		resized, err := image.Resize(profile.Width, profile.Height)
@@ -50,19 +70,24 @@ func (p BimgProcessor) Process(id string, bytes []byte, profiles []model.Profile
 			return nil, err
 		}
 
-		for j, format := range formats {
-			converted, err := bimg.NewImage(resized).Convert(format)
+		for j, imageType := range imageTypes {
+			converted, err := bimg.NewImage(resized).Convert(imageType)
 			if err != nil {
 				return nil, err
 			}
 
-			path := filepath.Join(p.tempDir, fmt.Sprintf("%s_%s.%v", id, profile.Name, bimg.ImageTypeName(format)))
+			path := filepath.Join(p.tempDir, fmt.Sprintf("%s_%s.%v", id, profile.Name, bimg.ImageTypeName(imageType)))
 			bimg.Write(path, converted)
 
-			results[i*len(formats)+j] = model.ProcessingResult{
+			format, err := toFormat(imageType)
+			if err != nil {
+				return nil, err
+			}
+
+			results[i*len(imageTypes)+j] = model.ProcessingResult{
 				File:    path,
 				Profile: profile,
-				Format:  model.NewFormat(bimg.ImageTypeName(format)),
+				Format:  format,
 			}
 		}
 	}

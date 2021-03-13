@@ -32,7 +32,7 @@ func NewLocalStorage(distDir string) *LocalStorage {
 
 func (s *LocalStorage) Store(id string, profile model.Profile, format model.Format, data []byte) error {
 	var profileName string
-	if profile.Default {
+	if profile == model.DefaultProfile {
 		profileName = model.DefaultProfile.Name
 	} else {
 		profileName = profile.Name

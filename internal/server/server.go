@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/abdollahpour/micro-image-manager/internal/model"
 	"github.com/abdollahpour/micro-image-manager/internal/processor"
@@ -112,7 +113,7 @@ func StoreHandler(imageProcessor processor.ImagePocessor, imageStorage storage.S
 			return
 		}
 
-		id := uuid.NewString()
+		id := strings.ReplaceAll(uuid.NewString(), "-", "")
 
 		results, err := imageProcessor.Process(id, fileBytes, profiles)
 		for _, result := range results {
@@ -168,10 +169,20 @@ func FetchHandler(imageStorage storage.Storage) func(w http.ResponseWriter, r *h
 		imageFounds := imageRe.FindStringSubmatch(r.URL.Path)
 		if len(imageFounds) == 3 {
 			id := imageFounds[1]
-			format := imageFounds[2]
-			profileName := profileNameRe.ReplaceAllString(r.URL.Query().Get("profile"), "")
+			format, err := model.NewFormat(imageFounds[2])
+			if err != nil {
+				fmt.Println(err)
+			}
 
-			filePath, err := imageStorage.Fetch(id, model.NewProfile(profileName), model.NewFormat(format))
+			profileName := profileNameRe.ReplaceAllString(r.URL.Query().Get("profile"), "")
+			var profile model.Profile
+			if len(profileName) == 0 {
+				profile = model.DefaultProfile
+			} else {
+				profile = model.NewProfile(profileName)
+			}
+
+			filePath, err := imageStorage.Fetch(id, profile, *format)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -180,6 +191,10 @@ func FetchHandler(imageStorage storage.Storage) func(w http.ResponseWriter, r *h
 			http.ServeFile(w, r, filePath)
 			return
 		}
+
+		log.WithFields(log.Fields{
+			"url": r.URL,
+		}).Info("Image not found")
 		http.NotFoundHandler().ServeHTTP(w, r)
 	}
 }
