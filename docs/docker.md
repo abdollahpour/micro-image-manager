@@ -4,7 +4,9 @@ You can simply run micro-image-center using docker:
 
 This will run micro-image-manager on port 8080. You can test it using curl as follow:
 
-    curl -F profile_small=400x300 -F profile_large=800x600 -F image=@P1030558.JPG http://localhost:8080/api/v1/images
+```bash
+curl -F profile_small=400x300 -F profile_large=800x600 -F image=@P1030558.JPG http://localhost:8080/api/v1/images
+```
 
 The response would be something like:
 
