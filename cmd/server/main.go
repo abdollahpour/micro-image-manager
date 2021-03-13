@@ -37,16 +37,9 @@ func main() {
 	conf := config.NewEnvConfiguration()
 
 	if _, err := os.Stat(conf.TempDir); os.IsNotExist(err) {
-		err = os.Mkdir(conf.TempDir, 0644)
+		err = os.Mkdir(conf.TempDir, 0744)
 		if err != nil {
 			log.Fatal("Failed to create temp dir: " + conf.TempDir)
-		}
-	}
-
-	if _, err := os.Stat(conf.DistDir); os.IsNotExist(err) {
-		err = os.Mkdir(conf.DistDir, 0644)
-		if err != nil {
-			log.Fatal("Failed to create dist dir: " + conf.DistDir)
 		}
 	}
 

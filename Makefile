@@ -11,7 +11,7 @@ archive:
 	done
 
 run:
-	go run cmd/mpg/main.go
+	go run cmd/server/main.go
 
 image:
 	docker build -t $(name) -f docker/Dockerfile . 

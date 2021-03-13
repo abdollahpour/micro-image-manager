@@ -5,31 +5,31 @@ import "strings"
 type Format string
 
 const (
-	JPEG Format = "JPEG"
-	GIF         = "GIF"
-	PNG         = "PNG"
-	WEBP        = "WEBP"
-	SVG         = "SVG"
+	JPEG Format = "jpeg"
+	GIF         = "gif"
+	PNG         = "png"
+	WEBP        = "webp"
+	SVG         = "svg"
 )
 
 var formatToString = map[Format]string{
-	JPEG: "JPEG",
-	GIF:  "GIF",
-	PNG:  "PNG",
-	WEBP: "WEBP",
-	SVG:  "SVG",
+	JPEG: "jpeg",
+	GIF:  "gif",
+	PNG:  "png",
+	WEBP: "webp",
+	SVG:  "svg",
 }
 
 var stringToFormat = map[string]Format{
-	"JPEG": JPEG,
-	"GIF":  GIF,
-	"PNG":  PNG,
-	"WEBP": WEBP,
-	"SVG":  SVG,
+	"jpeg": JPEG,
+	"gif":  GIF,
+	"png":  PNG,
+	"webp": WEBP,
+	"svg":  SVG,
 }
 
 func NewFormat(value string) Format {
-	return stringToFormat[strings.ToUpper(value)]
+	return stringToFormat[strings.ToLower(value)]
 }
 
 func (f *Format) String() string {

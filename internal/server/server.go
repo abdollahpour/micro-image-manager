@@ -116,9 +116,9 @@ func StoreHandler(imageProcessor processor.ImagePocessor, imageStorage storage.S
 
 		results, err := imageProcessor.Process(id, fileBytes, profiles)
 		for _, result := range results {
-			log.Error("Error to process the image")
 			data, err := ioutil.ReadFile(result.File)
 			if err != nil {
+				log.WithError(err).Error("Error to process the image")
 				w.WriteHeader(http.StatusInternalServerError)
 				jsonapi.MarshalErrors(w, []*jsonapi.ErrorObject{{
 					Title:  "Internal server error",
@@ -130,7 +130,7 @@ func StoreHandler(imageProcessor processor.ImagePocessor, imageStorage storage.S
 
 			err = imageStorage.Store(id, result.Profile, result.Format, data)
 			if err != nil {
-				log.Error("Error to store the image")
+				log.WithError(err).Error("Error to store the image")
 				w.WriteHeader(http.StatusInternalServerError)
 				jsonapi.MarshalErrors(w, []*jsonapi.ErrorObject{{
 					Title:  "Internal server error",
@@ -148,7 +148,7 @@ func StoreHandler(imageProcessor processor.ImagePocessor, imageStorage storage.S
 		}
 		resultData, err := json.Marshal(result)
 		if err != nil {
-			log.Error("Error to serialize the result")
+			log.WithError(err).Error("Error to serialize the result")
 			w.WriteHeader(http.StatusInternalServerError)
 			jsonapi.MarshalErrors(w, []*jsonapi.ErrorObject{{
 				Title:  "Internal server error",
