@@ -87,6 +87,11 @@ func StoreHandler(imageProcessor processor.ImagePocessor, imageStorage storage.S
 			}
 		}
 
+		// Largest image would be the detault profile
+		// TODO: Make it more self-describing
+		model.SortProfile(profiles)
+		profiles[0].Name = model.DefaultProfile.Name
+
 		file, _, err := r.FormFile("image")
 		if err != nil {
 			log.Trace("No image found")

@@ -38,11 +38,11 @@ func toFormat(bimgFormat bimg.ImageType) (model.Format, error) {
 	case bimgFormat == bimg.JPEG:
 		return model.JPEG, nil
 	case bimgFormat == bimg.PNG:
-		return model.JPEG, nil
+		return model.PNG, nil
 	case bimgFormat == bimg.WEBP:
-		return model.JPEG, nil
+		return model.WEBP, nil
 	case bimgFormat == bimg.SVG:
-		return model.JPEG, nil
+		return model.SVG, nil
 	default:
 		return model.NOT_SUPPORTED, fmt.Errorf("Format not supported: %v", bimgFormat)
 	}
@@ -65,7 +65,7 @@ func (p BimgProcessor) Process(id string, bytes []byte, profiles []model.Profile
 	results := make([]model.ProcessingResult, len(profiles)*len(imageTypes))
 
 	for i, profile := range profiles {
-		resized, err := image.Resize(profile.Width, profile.Height)
+		resized, err := image.ResizeAndCrop(profile.Width, profile.Height)
 		if err != nil {
 			return nil, err
 		}
@@ -89,6 +89,11 @@ func (p BimgProcessor) Process(id string, bytes []byte, profiles []model.Profile
 				Profile: profile,
 				Format:  format,
 			}
+		}
+
+		// Reset tht image. In an unexpected bahaviar bimg also change size of the source image
+		if i < len(imageTypes)-1 {
+			image = bimg.NewImage(bytes)
 		}
 	}
 

@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"sort"
 	"strings"
 )
 
@@ -60,4 +61,10 @@ type ProcessingResult struct {
 	File    string
 	Profile Profile
 	Format  Format
+}
+
+func SortProfile(profiles []Profile) {
+	sort.SliceStable(profiles, func(i, j int) bool {
+		return profiles[i].Width*profiles[i].Height > profiles[j].Width*profiles[j].Height
+	})
 }
