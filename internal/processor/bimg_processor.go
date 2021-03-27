@@ -76,7 +76,15 @@ func (p BimgProcessor) Process(id string, bytes []byte, profiles []model.Profile
 				return nil, err
 			}
 
-			path := filepath.Join(p.tempDir, fmt.Sprintf("%s_%s.%v", id, profile.Name, bimg.ImageTypeName(imageType)))
+			// First profile is default profile
+			var profileName string
+			if i == 0 {
+				profileName = model.DefaultProfile.Name
+			} else {
+				profileName = profile.Name
+			}
+
+			path := filepath.Join(p.tempDir, fmt.Sprintf("%s_%s.%v", id, profileName, bimg.ImageTypeName(imageType)))
 			bimg.Write(path, converted)
 
 			format, err := toFormat(imageType)

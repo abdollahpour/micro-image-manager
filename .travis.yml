@@ -9,18 +9,24 @@ services:
 env:
   global:
     - GOLANG_VERSION="${TRAVIS_GO_VERSION}"
-    - MIM_VERSION="${TRAVIS_TAG:-development}"
-  matrix:
-    - LIBVIPS=8.10.0
+    - APP_VERSION="${TRAVIS_TAG:-development}"
+    - VIPS_VERSION=8.10.0
+
+cache:
+  apt: true
+  directories:
+    - $HOME/vips
 
 before_install:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker pull abdollahpour/micro-image-manager:latest || true
+  - go get github.com/mattn/goveralls
 
 script:
-  - docker build --pull --cache-from abdollahpour/micro-image-manager:latest --build-arg GOLANG_VERSION="${GOLANG_VERSION%.x}" --build-arg LIBVIPS_VERSION="${LIBVIPS}" --build-arg MIM_VERSION="${MIM_VERSION}" --tag abdollahpour/micro-image-manager:${MIM_VERSION} --tag abdollahpour/micro-image-manager:latest -f docker/Dockerfile .
-  - docker push abdollahpour/micro-image-manager:${MIM_VERSION}
-  - docker push abdollahpour/micro-image-manager:latest
+  - make test_in_docker
+  - make GOLANG_VERSION="${GOLANG_VERSION%.x}" VIPS_VERSION="${VIPS_VERSION}" APP_VERSION="${APP_VERSION}" DOCKER_IMAGE="${DOCKER_IMAGE}" image
+
+after_success:
+  - $GOPATH/bin/goveralls -service=travis-ci -coverprofile=coverage.out
 
 notifications:
   email: true

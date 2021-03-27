@@ -29,12 +29,12 @@ func TestBimgProcessor(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, []model.ProcessingResult{
 		{
-			File:    path.Join(os.TempDir(), id+"_large.png"),
+			File:    path.Join(os.TempDir(), id+"_default.png"),
 			Profile: large,
 			Format:  model.PNG,
 		},
 		{
-			File:    path.Join(os.TempDir(), id+"_large.webp"),
+			File:    path.Join(os.TempDir(), id+"_default.webp"),
 			Profile: large,
 			Format:  model.WEBP,
 		},
