@@ -1,5 +1,6 @@
 ARG GOLANG_VERSION=1.16
 FROM golang:${GOLANG_VERSION}
+ARG VIPS_VERSION=8.10.0
 
 # Installs libvips + required libraries
 RUN DEBIAN_FRONTEND=noninteractive \
