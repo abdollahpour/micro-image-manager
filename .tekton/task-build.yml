@@ -18,11 +18,11 @@ spec:
       description: Tag of the images to be used.
   steps:
     - name: build
-      image: golang:1.16-alpine
+      image: golang:1.16
       workingDir: $(workspaces.source.path)
       script: |
-        go get ./...
-        CGO_ENABLED=0 GOOS=linux go build -ldflags="-X main.Version=1.0" -a -installsuffix cgo -o server /workspace/source/cmd/server/main.go
+        make dependencies
+        make build
     - name: push
       image: gcr.io/kaniko-project/executor:v1.6.0
       # specifying DOCKER_CONFIG is required to allow kaniko to detect docker credential
