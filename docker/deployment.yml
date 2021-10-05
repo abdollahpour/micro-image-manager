@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: micro-image-manager
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micro-image-manager
+  namespace: micro-image-manager
+  labels:
+    app: micro-image-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: micro-image-manager
+  template:
+    metadata:
+      labels:
+        app: micro-image-manager
+    spec:
+      containers:
+        - name: micro-image-manager
+          image: __IMAGE__:__TAG__
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: MIM_DIST_DIR
+              value: /data
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: micro-image-manager-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: micro-image-manager
+  namespace: micro-image-manager
+spec:
+  selector:
+    app: micro-image-manager
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: micro-image-manager
+  namespace: micro-image-manager
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts:
+        - your-domain.com
+      secretName: micro-pdf-generator-cert
+  rules:
+    - host: your-domain.com
+      http:
+        paths:
+          # FOR TESTS ONLY
+          # You should not expose API endpoint publicly
+          # This API is for other microservices to write image
+          - path: /api/v1/images
+            pathType: Exact
+            backend:
+              service:
+                name: micro-image-manager
+                port:
+                  number: 80
+          - path: /images
+            pathType: Prefix
+            backend:
+              service:
+                name: micro-image-manager
+                port:
+                  number: 80
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: micro-image-manager
+  namespace: micro-image-manager
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi

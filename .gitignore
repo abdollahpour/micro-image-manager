@@ -1,5 +1,6 @@
 .*
 !.gitignore
 !.travis.yml
+!.tekton
 coverage.out
 images/

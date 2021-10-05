@@ -5,24 +5,14 @@
 
 # micro-image-manager
 
-One of the biggest challenges to manage media in microservices is distributing them in the cluster. micro-image-manager help you to manage and optimize them without bringing the whole new info structure and complexity in your app.
+One of the biggest challenges to manage media in microservices is distributing them. It's hard to find out how is responsible to store, optimizing, and distribute them. Also, it's hard to implement and it brings a load of dependencies into your service.
+micro-image-manager helps to do that simply in an elegant way. You can have images optimized in different format and sizes with a simple HTTP call.
 
-micro-image-manager is a simple, fast, and scalable solution to manage, distributed, and optimize your images. Some of the main features are:
+Let's see and example. You need an image. Run the server and then:
 
-* Convert images to different formats and sizes for different target browser and mobile
-* Crop & resize images
-* Optimize images (jpeg & webp)
-* Distributed images using Persistance Storage
+    curl -F profile_small=400x300 -F profile_large=800x600 -F image=@my_image.jpg http://localhost:8080/api/v1/images
 
-# How to use it
-micro-image-manager bring two endpoints:
-
-## `/api/v1/images`
-Is the one you use to manage images. You DON'T open this endpoint to the public. You can simply post image to this endpoint:
-
-    curl -F profile_small=400x300 -F profile_large=800x600 -F image=@my_image.jpg http://localhost:8700/api/v1/images
-
-This will return:
+This will return something like (different ID):
 
     {
         "id": "5f4a459d28317a9f153c211d",
@@ -41,45 +31,26 @@ This will return:
         "formats": ["jpeg", "webp"]
     }
 
-and create images in two different size and two different formats for you (jpeg, webp).
-
-## `/image/<IMAGE_ID>.<FORMAT>`
-It fetches the biggest image with a format that the browser supports for you. For example, in chrome, it shows 800x600.webp.
-
-    /image/<IMAGE_ID>.jpeg
-
-Or the size (profile):
-
-    /image/<IMAGE_ID>.jpeg?profile=small
-
-If you put a profile that does not exist you will still get the largest image.
-
-## Use it with HTML5
-You can use HTML5 to check the format support:
+You can use HTML5 to host your images, fast and efficiently:
 
     <picture>
-        <source srcset="/image/5f4a459d28317a9f153c211d.webp" type="image/webp" />
-        <img src="/image/5f4a459d28317a9f153c211d.jpeg" alt="Alt Text!" />
+        <source srcset="//localhost:8080/image/5f4a459d28317a9f153c211d.webp" type="image/webp" />
+        <img src="//localhost:8080/image/5f4a459d28317a9f153c211d.jpeg" alt="Alt Text!" />
     </picture>
 
 Or even optimize the image for different screen sizes that can boost up performance on mobile phones:
 
-    <img src="/image/5f4a459d28317a9f153c211d.webp?profile=small"
-    srcset="/image/5f4a459d28317a9f153c211d.webp?profile=large 800w"
+    <img src="//localhost:8080/image/5f4a459d28317a9f153c211d.webp?profile=small"
+    srcset="//localhost:8080/image/5f4a459d28317a9f153c211d.webp?profile=large 800w"
     alt="Image description">
 
 Please check HTML5 documentation for all possible combinations.
 
-# How to run it?
+# More documents
 
-## Use binary
-Download binary from your system from releases and just run it!
-
-## Use docker
-
-    docker run -d -p 8080:8080 abdollahpour/micro-image-manager
-
-Application is ready on `localhost:8080`
+- [Run using Kubernetes](docs/kubernetes.md)
+- [Test using Docker](docs/docker.md)
+- [API documentations](docs/api.md)
 
 # Use helm for kubernetes
 

@@ -41,4 +41,4 @@ RUN go get github.com/mattn/goveralls
 COPY internal internal/
 COPY cmd cmd/
 
-CMD make get test goveralls
+RUN make get test
