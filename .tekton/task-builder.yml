@@ -1,0 +1,29 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: micro-image-manager-builder
+spec:
+  resources:
+    inputs:
+      - name: source
+        type: git
+    outputs:
+      - name: builtImage
+        type: image
+  workspaces:
+    - name: source
+  steps:
+    - name: image
+      image: gcr.io/kaniko-project/executor:v1.6.0
+      # specifying DOCKER_CONFIG is required to allow kaniko to detect docker credential
+      env:
+        - name: "DOCKER_CONFIG"
+          value: "/tekton/home/.docker/"
+      command:
+        - /kaniko/executor
+      args:
+        - --dockerfile=$(workspaces.source.path)/docker/Dockerfile-builder
+        - --destination=$(resources.outputs.builtImage.url):builder
+        - --context=$(workspaces.source.path)
+        - --cache=true
+        - --cache-ttl=1000h

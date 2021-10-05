@@ -17,9 +17,24 @@ spec:
     - name: namespace
       description: Target namespace
   tasks:
+    - name: builder
+      taskRef:
+        name: micro-image-manager-builder
+      resources:
+        inputs:
+          - name: source
+            resource: source
+        outputs:
+          - name: builtImage
+            resource: builtImage
+      workspaces:
+        - name: source
+          workspace: source
     - name: build
       taskRef:
         name: micro-image-manager-build
+      runAfter:
+        - builder
       resources:
         inputs:
           - name: source
@@ -38,6 +53,8 @@ spec:
     - name: test
       taskRef:
         name: micro-image-manager-test
+      runAfter:
+        - builder
       resources:
         inputs:
           - name: source
