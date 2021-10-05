@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: micro-image-manager-test
+spec:
+  resources:
+    inputs:
+      - name: source
+        type: git
+  workspaces:
+    - name: source
+    - name: cache
+  steps:
+    - name: unit-test
+      image: golang:1.16
+      workingDir: $(workspaces.source.path)
+      script: |
+        go get ./...
+        make test
+  sidecars:
+    - image: mongo:latest
+      name: mongo

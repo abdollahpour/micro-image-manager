@@ -1,0 +1,70 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: micro-image-manager
+spec:
+  workspaces:
+    - name: source
+    - name: cache
+  resources:
+    - name: source
+      type: git
+    - name: builtImage
+      type: image
+  params:
+    - name: imageTag
+      description: Tag of the images to be used.
+    - name: namespace
+      description: Target namespace
+  tasks:
+    - name: build
+      taskRef:
+        name: micro-image-manager-build
+      resources:
+        inputs:
+          - name: source
+            resource: source
+        outputs:
+          - name: builtImage
+            resource: builtImage
+      workspaces:
+        - name: source
+          workspace: source
+        - name: cache
+          workspace: cache
+      params:
+        - name: imageTag
+          value: "$(params.imageTag)"
+    - name: test
+      taskRef:
+        name: micro-image-manager-test
+      resources:
+        inputs:
+          - name: source
+            resource: source
+      workspaces:
+        - name: source
+          workspace: source
+        - name: cache
+          workspace: cache
+    - name: deploy
+      taskRef:
+        name: micro-image-manager-deploy
+      runAfter:
+        - build
+        - test
+      resources:
+        inputs:
+          - name: source
+            resource: source
+        outputs:
+          - name: builtImage
+            resource: builtImage
+      workspaces:
+        - name: source
+          workspace: source
+      params:
+        - name: imageTag
+          value: "$(params.imageTag)"
+        - name: namespace
+          value: "$(params.namespace)"
