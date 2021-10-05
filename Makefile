@@ -46,3 +46,7 @@ test:
 
 goveralls:
 	$$GOPATH/bin/goveralls -service=travis-ci -coverprofile=coverage.out
+
+pipeline:
+	GITHUB_SHA=$$(git rev-parse HEAD)
+	@for f in $(shell ls .tekton/pipeline-run-*); do cat $${f} | sed "s/latest/$${GITHUB_SHA}/g" | kubectl create -f -; done
