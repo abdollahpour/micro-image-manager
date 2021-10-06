@@ -12,23 +12,10 @@ spec:
         type: image
   workspaces:
     - name: source
-    - name: cache
   params:
     - name: imageTag
       description: Tag of the images to be used.
   steps:
-    - name: builder
-      image: gcr.io/kaniko-project/executor:v1.6.0
-      # specifying DOCKER_CONFIG is required to allow kaniko to detect docker credential
-      env:
-        - name: "DOCKER_CONFIG"
-          value: "/tekton/home/.docker/"
-      command:
-        - /kaniko/executor
-      args:
-        - --dockerfile=$(workspaces.source.path)/docker/Dockerfile-tkn
-        - --destination=$(resources.outputs.builtImage.url):builder
-        - --context=$(workspaces.source.path)
     - name: image
       image: gcr.io/kaniko-project/executor:v1.6.0
       # specifying DOCKER_CONFIG is required to allow kaniko to detect docker credential

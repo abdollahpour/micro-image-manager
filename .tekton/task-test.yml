@@ -9,14 +9,16 @@ spec:
         type: git
   workspaces:
     - name: source
-    - name: cache
   steps:
-    - name: unit-test
-      image: golang:1.16
-      workingDir: $(workspaces.source.path)
-      script: |
-        go get ./...
-        make test
-  sidecars:
-    - image: mongo:latest
-      name: mongo
+    - name: image
+      image: gcr.io/kaniko-project/executor:v1.6.0
+      # specifying DOCKER_CONFIG is required to allow kaniko to detect docker credential
+      env:
+        - name: "DOCKER_CONFIG"
+          value: "/tekton/home/.docker/"
+      command:
+        - /kaniko/executor
+      args:
+        - --dockerfile=$(workspaces.source.path)/docker/Dockerfile-test
+        - --context=$(workspaces.source.path)
+        - --no-push
