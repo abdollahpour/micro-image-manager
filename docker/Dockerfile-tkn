@@ -48,14 +48,14 @@ CMD sh
 
 FROM debian:buster-slim
 
-COPY --from=builder /usr/local/lib /usr/local/lib
+COPY --from=builder /usr/local/lib/libvips* /usr/local/lib
 COPY --from=builder /usr/local/bin/mim-server /usr/local/bin/mim-server
-COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 
 # Install runtime dependencies
 RUN DEBIAN_FRONTEND=noninteractive \
   apt-get update && \
   apt-get install --no-install-recommends -y \
+  ca-certificates \
   procps libglib2.0-0 libjpeg62-turbo libpng16-16 libopenexr23 \
   libwebp6 libwebpmux3 libwebpdemux2 libtiff5 libgif7 libexif12 libxml2 libpoppler-glib8 \
   libmagickwand-6.q16-6 libpango1.0-0 libmatio4 libopenslide0 \
