@@ -46,10 +46,20 @@ func DecodeProfile(key string, value string) (*model.Profile, error) {
 	return nil, nil
 }
 
-func StoreHandler(imageProcessor processor.ImagePocessor, imageStorage storage.Storage) func(w http.ResponseWriter, r *http.Request) {
+func testHandler(w http.ResponseWriter, r *http.Request) {
+}
+
+func StoreHandler(imageProcessor processor.ImageProcessor, imageStorage storage.Storage) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
-			w.WriteHeader(http.StatusMethodNotAllowed)
+			//go:embed static/index.html
+			var content []byte
+
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(content)
+
+			staticHandler := http.ServeFile(w, r)
+			staticHandler(w, r)
 			return
 		}
 
@@ -87,7 +97,7 @@ func StoreHandler(imageProcessor processor.ImagePocessor, imageStorage storage.S
 			}
 		}
 
-		// Largest (First profile) image would be the detault profile
+		// Largest (First profile) image would be the default profile
 		// TODO: Make it more self-describing
 		model.SortProfile(profiles)
 
