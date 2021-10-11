@@ -1,7 +1,7 @@
 package server
 
 import (
-	"embed"
+	_ "embed"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -23,9 +23,9 @@ import (
 var content []byte
 
 type StoreHandlerResult struct {
-	Id       string
-	Profiles []model.Profile
-	Formats  []model.Format
+	Id       string          `bson:"id" json:"id"`
+	Profiles []model.Profile `bson:"profiles" json:"profiles"`
+	Formats  []model.Format  `bson:"formats" json:"formats"`
 }
 
 var (

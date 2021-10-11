@@ -46,9 +46,9 @@ func (f *Format) String() string {
 }
 
 type Profile struct {
-	Name   string
-	Width  int
-	Height int
+	Name   string `bson:"name" json:"name"`
+	Width  int    `bson:"width" json:"width"`
+	Height int    `bson:"height" json:"height"`
 }
 
 var DefaultProfile = Profile{Name: "default"}
@@ -58,9 +58,9 @@ func NewProfile(name string) Profile {
 }
 
 type ProcessingResult struct {
-	File    string
-	Profile Profile
-	Format  Format
+	File    string  `bson:"file" json:"file"`
+	Profile Profile `bson:"profile" json:"profile"`
+	Format  Format  `bson:"format" json:"format"`
 }
 
 func SortProfile(profiles []Profile) {
