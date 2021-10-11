@@ -1,4 +1,4 @@
-FROM abdollahpour/go-libvip:1.16 as builder
+FROM abdollahpour/go-libvip:1.17 as builder
 ARG APP_VERSION=edge
 
 WORKDIR ${GOPATH}/src/github.com/abdollahpour/micro-image-manager
@@ -17,7 +17,7 @@ RUN GOOS=linux go build \
   -o /usr/local/bin/mim-server cmd/server/main.go
 CMD sh
 
-FROM abdollahpour/go-libvip:1.16
+FROM abdollahpour/go-libvip:1.17
 
 COPY --from=builder /usr/local/bin/mim-server /usr/local/bin/mim-server
 

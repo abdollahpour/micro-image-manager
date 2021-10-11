@@ -1,6 +1,7 @@
 package server
 
 import (
+	"embed"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,6 +18,9 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 )
+
+//go:embed static/index.html
+var content []byte
 
 type StoreHandlerResult struct {
 	Id       string
@@ -52,14 +56,8 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 func StoreHandler(imageProcessor processor.ImageProcessor, imageStorage storage.Storage) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
-			//go:embed static/index.html
-			var content []byte
-
-			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			w.Write(content)
-
-			staticHandler := http.ServeFile(w, r)
-			staticHandler(w, r)
 			return
 		}
 
