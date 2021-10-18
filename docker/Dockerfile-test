@@ -1,4 +1,4 @@
-FROM abdollahpour/go-libvip:1.16
+FROM abdollahpour/go-libvip:1.17
 ARG APP_VERSION=edge
 
 WORKDIR ${GOPATH}/src/github.com/abdollahpour/micro-image-manager

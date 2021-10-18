@@ -12,12 +12,13 @@ spec:
         type: image
   workspaces:
     - name: source
+    - name: cache
   params:
     - name: imageTag
       description: Tag of the images to be used.
   steps:
     - name: image
-      image: gcr.io/kaniko-project/executor@sha256:e36c9fa99279217c4bb8ee172819b441c3ca8ef946dc0e28b21721eefb2ba70a
+      image: gcr.io/kaniko-project/executor:latest
       # specifying DOCKER_CONFIG is required to allow kaniko to detect docker credential
       env:
         - name: "DOCKER_CONFIG"
@@ -28,5 +29,6 @@ spec:
         - --dockerfile=$(workspaces.source.path)/docker/Dockerfile-tkn
         - --destination=$(resources.outputs.builtImage.url):$(params.imageTag)
         - --context=$(workspaces.source.path)
-      securityContext:
-        runAsUser: 0
+        - --cleanup=false
+        - --cache=true
+        - --cache-dir=$(workspaces.cache.path)/kaniko

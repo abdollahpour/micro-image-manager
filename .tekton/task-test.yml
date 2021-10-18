@@ -9,6 +9,7 @@ spec:
         type: git
   workspaces:
     - name: source
+    - name: cache
   steps:
     - name: image
       image: gcr.io/kaniko-project/executor:v1.6.0
@@ -22,3 +23,6 @@ spec:
         - --dockerfile=$(workspaces.source.path)/docker/Dockerfile-test
         - --context=$(workspaces.source.path)
         - --no-push
+        - --cleanup=false
+        - --cache=true
+        - --cache-dir=$(workspaces.cache.path)/kaniko

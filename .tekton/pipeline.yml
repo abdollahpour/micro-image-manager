@@ -30,6 +30,8 @@ spec:
       workspaces:
         - name: source
           workspace: source
+        - name: cache
+          workspace: cache
       params:
         - name: imageTag
           value: "$(params.imageTag)"
@@ -59,6 +61,8 @@ spec:
       workspaces:
         - name: source
           workspace: source
+        - name: cache
+          workspace: cache
       params:
         - name: imageTag
           value: "$(params.imageTag)"
