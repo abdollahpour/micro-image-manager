@@ -1,4 +1,5 @@
 {{- if .Values.ingress.enabled -}}
+{{- $ingress := .Values.ingress -}}
 {{- $fullName := include "micro-image-manager.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
 apiVersion: networking.k8s.io/v1
@@ -34,7 +35,7 @@ spec:
                 name: {{ $fullName }}
                 port:
                   number: {{ $svcPort }}
-          {{- if .Values.ingress.publicManagement -}}
+          {{- if $ingress.publicManagement -}}
           - path: /api/v1/images
             pathType: Exact
             backend:

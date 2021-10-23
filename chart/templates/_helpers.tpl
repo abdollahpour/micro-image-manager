@@ -49,14 +49,3 @@ Selector labels
 app.kubernetes.io/name: {{ include "micro-image-manager.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "micro-image-manager.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "micro-image-manager.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
