@@ -38,13 +38,13 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: chart-example.local
+      # Public endpoint must not be publicly available this could be used for tests.
+      # Check the documentation for details
+      publicManagement: false
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
-  # Public endpoint must not be publicly available this could be used for tests.
-  # Check the documentation for details
-  publicManagement: false
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
