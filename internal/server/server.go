@@ -210,3 +210,10 @@ func FetchHandler(imageStorage storage.Storage) func(w http.ResponseWriter, r *h
 		http.NotFoundHandler().ServeHTTP(w, r)
 	}
 }
+
+func Live(imageStorage storage.Storage) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// TODO: Check disk readiness
+		w.WriteHeader(http.StatusOK)
+	}
+}

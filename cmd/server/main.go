@@ -49,6 +49,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/v1/images", server.StoreHandler(imageProcessor, imageStorage))
 	mux.HandleFunc("/image/", server.FetchHandler(imageStorage))
+	mux.HandleFunc("/live", server.Live(imageStorage))
 	log.Println(fmt.Sprintf("Listen on port %d", conf.Port))
 	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d", conf.Host, conf.Port), mux))
 }
