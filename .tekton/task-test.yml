@@ -25,4 +25,4 @@ spec:
         - --no-push
         - --cleanup=false
         - --cache=true
-        - --cache-dir=$(workspaces.cache.path)/kaniko
+        - --cache-repo=index.docker.io/abdollahpour/cache

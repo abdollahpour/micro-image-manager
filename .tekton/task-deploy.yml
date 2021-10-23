@@ -17,18 +17,35 @@ spec:
       description: Tag of the images to be used.
     - name: namespace
       description: Target namespace
+    - name: host
+      description: Host for deployment
+    - name: secret
+      description: generated certificate name
   steps:
     - name: deploy
       image: lachlanevenson/k8s-helm:v3.6.2
       workingDir: $(workspaces.source.path)
       script: |
-        helm upgrade \
-          -f chart/values/production.yml \
+        helm upgrade -f - \
           --install \
-          --set "image.repository=$(resources.outputs.builtImage.url)" \
-          --set "image.tag=$(params.imageTag)" \
-          --set "image.pullPolicy=Always" \
           --timeout "4m0s" \
           --wait \
           --namespace "$(params.namespace)" \
-          micro-image-manager /workspace/source/chart
+          --debug \
+          micro-image-manager /workspace/source/chart << EOF
+          image:
+            repository: $(resources.outputs.builtImage.url)
+            tag: $(params.imageTag)
+            pullPolicy: Always
+          ingress:
+            annotations:
+              kubernetes.io/ingress.class: "nginx"
+              kubernetes.io/tls-acme: "true"
+            hosts:
+              - host: $(params.host)
+                publicManagement: true
+            tls:
+              - secretName: $(params.secret)
+                hosts:
+                  - $(params.host)
+        EOF

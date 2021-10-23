@@ -17,24 +17,6 @@ spec:
     - name: namespace
       description: Target namespace
   tasks:
-    - name: build
-      taskRef:
-        name: micro-image-manager-build
-      resources:
-        inputs:
-          - name: source
-            resource: source
-        outputs:
-          - name: builtImage
-            resource: builtImage
-      workspaces:
-        - name: source
-          workspace: source
-        - name: cache
-          workspace: cache
-      params:
-        - name: imageTag
-          value: "$(params.imageTag)"
     - name: test
       taskRef:
         name: micro-image-manager-test
@@ -45,11 +27,12 @@ spec:
       workspaces:
         - name: source
           workspace: source
-    - name: deploy
+        - name: cache
+          workspace: cache
+    - name: build
       taskRef:
-        name: micro-image-manager-deploy
+        name: micro-image-manager-build
       runAfter:
-        - build
         - test
       resources:
         inputs:
@@ -66,5 +49,3 @@ spec:
       params:
         - name: imageTag
           value: "$(params.imageTag)"
-        - name: namespace
-          value: "$(params.namespace)"
