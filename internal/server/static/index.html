@@ -23,48 +23,195 @@
 
     <link rel="icon" href="data:," />
     <style>
+      body {
+        background-color: #eee;
+      }
       .form-set {
         margin: 1em;
       }
       .container {
-        margin: 1em;
+        margin: auto;
+        margin-top: 3em;
+        max-width: 1024px;
+        width: 100%;
+        background-color: white;
+        padding: 1.2em;
+        box-shadow: 5px 5px 15px 5px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+      }
+      #upload_container {
+        width: 100%;
+        border: 2px dashed #999;
+        background-color: rgb(241, 244, 249);
+        border-radius: 10px;
+        text-align: center;
+      }
+      .dragover {
+        background-color: rgba(207, 217, 232, 0.911);
+      }
+      #image {
+        display: none;
+      }
+      #image_label {
+        padding: 4em 2em;
+        display: block;
+      }
+      .image_container img {
+        max-width: 100%;
+      }
+      .image_container span {
+        background-color: #fac6c6;
+        border-radius: 0.3em;
+        padding: 0.3em;
+      }
+      h4 {
+        color: rgb(145, 84, 84);
+        background-color: #f4e9e9;
+        border-radius: 10px;
+        padding: 10px;
       }
     </style>
   </head>
 
   <body>
-    <form
-      action="/api/v1/images"
-      method="post"
-      enctype="multipart/form-data"
-      id="form"
-    >
-      <div class="form-set">
-        <label for="image">Image:</label>
-        <input name="image" type="file" id="image" />
-      </div>
-      <div class="form-set">
-        <label for="small">Small:</label>
-        <input name="profile_small" value="400x300" id="small" />
-      </div>
-      <div class="form-set">
-        <label for="large">Large:</label>
-        <input name="profile_large" value="800x600" id="large" />
-      </div>
-      <div class="form-set">
-        <button type="submit">Send!</button>
-      </div>
-    </form>
-    <div id="container"></div>
+    <div class="container">
+      <h4>
+        This endpoint is just for test and should not publicly be revealed. For
+        more information please check the project's page
+        <a
+          target="_blank"
+          href="https://github.com/abdollahpour/micro-image-manager"
+          >here</a
+        >.
+      </h4>
+      <form
+        action="/api/v1/images"
+        method="post"
+        enctype="multipart/form-data"
+        id="form"
+      >
+        <div id="upload_container">
+          <label for="image" id="image_label"
+            >Tap here or drop an image to upload</label
+          >
+          <input name="image" type="file" id="image" />
+        </div>
+        <h3>Profiles:</h3>
+        <div class="form-set">
+          <label>Profile 1:</label>
+          <input name="profile_name" value="large" />
+          <input name="profile_width" value="1200" />
+          <input name="profile_height" value="627" />
+        </div>
+        <div class="form-set">
+          <label>Profile 2:</label>
+          <input name="profile_name" value="small" />
+          <input name="profile_width" value="400" />
+          <input name="profile_height" value="209" />
+        </div>
+        <div class="form-set">
+          <label>Profile 3:</label>
+          <input name="profile_name" placeholder="Profile's name" />
+          <input name="profile_width" placeholder="Width" />
+          <input name="profile_height" placeholder="Height" />
+        </div>
+        <div class="form-set">
+          <label>Profile 4:</label>
+          <input name="profile_name" placeholder="Profile's name" />
+          <input name="profile_width" placeholder="Width" />
+          <input name="profile_height" value="" placeholder="Height" />
+        </div>
+        <div class="form-set">
+          <label>Profile 5:</label>
+          <input name="profile_name" placeholder="Profile's name" />
+          <input name="profile_width" placeholder="Width" />
+          <input name="profile_height" placeholder="Height" />
+        </div>
+      </form>
+      <div id="results"></div>
+    </div>
     <script>
+      var imageLabel = document.getElementById("image_label");
+      var image = document.getElementById("image");
       var form = document.getElementById("form");
-      var container = document.getElementById("container");
+      var results = document.getElementById("results");
+      var uploadContainer = document.getElementById("upload_container");
+      var uploadContainer = document.getElementById("upload_container");
 
-      form.onsubmit = function (e) {
-        e.preventDefault();
+      image.onchange = (e) => {
+        if (e.target.files.length > 0) {
+          submit(e.target.files[0]);
+        }
+      };
 
+      var isAdvancedUpload = (function () {
+        var div = document.createElement("div");
+        return (
+          ("draggable" in div || ("ondragstart" in div && "ondrop" in div)) &&
+          "FormData" in window &&
+          "FileReader" in window
+        );
+      })();
+      if (isAdvancedUpload) {
+        "drag dragstart dragend dragover dragenter dragleave drop"
+          .split(" ")
+          .forEach(function (event) {
+            uploadContainer.addEventListener(
+              event,
+              function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+              },
+              false
+            );
+          });
+        "dragover dragenter".split(" ").forEach(function (event) {
+          uploadContainer.addEventListener(
+            event,
+            function (e) {
+              e.target.className = "dragover";
+            },
+            false
+          );
+        });
+        "dragleave dragend drop".split(" ").forEach(function (event) {
+          uploadContainer.addEventListener(
+            event,
+            function (e) {
+              e.target.className = "";
+            },
+            false
+          );
+        });
+        "drop".split(" ").forEach(function (event) {
+          uploadContainer.addEventListener(
+            event,
+            function (e) {
+              submit(e.dataTransfer.files[0]);
+            },
+            false
+          );
+        });
+      }
+
+      var submit = function (file) {
         var xhr = new XMLHttpRequest();
-        var data = new FormData(form);
+        var data = new FormData();
+
+        var names = document.querySelectorAll("[name='profile_name']");
+        var widths = document.querySelectorAll("[name='profile_width']");
+        var heights = document.querySelectorAll("[name='profile_height']");
+
+        for (var i = 0; i < names.length; i++) {
+          if (names[i].value && widths[i].value && heights[i].value) {
+            data.append(
+              "profile_" + names[i].value,
+              widths[i].value + "x" + heights[i].value
+            );
+          }
+        }
+
+        data.append("image", file);
 
         xhr.onload = function () {
           var json = JSON.parse(this.responseText);
@@ -74,13 +221,15 @@
               (profile) =>
                 `
                   <div class="image_container">
-                    <p>Profile: ${profile.name} Format: ${format} Size: ${profile.width}x${profile.height}</p>
-                    <img src="/image/${json.id}.${format}?profile=${profile.name}" />
+                    <p>Profile: <span>${profile.name}</span> Format: <span>${format}</span> Size: <span>${profile.width}x${profile.height}</span></p>
+                    <a href='/image/${json.id}.${format}?profile=${profile.name}' target='_blank'><img src="/image/${json.id}.${format}?profile=${profile.name}" /></a>
                   </div>
                 `
             )
           );
-          container.innerHTML = [].concat.apply([], arrays).join("");
+          results.innerHTML = [].concat
+            .apply(["<h2>Results:</h2>"], arrays)
+            .join("");
         };
 
         xhr.open("post", form.action);
