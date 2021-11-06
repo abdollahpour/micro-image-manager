@@ -48,6 +48,7 @@ Please check HTML5 documentation for all possible combinations.
 
 # More documents
 
+- [Architecture](docs/architecture.md)
 - [Run using Kubernetes](docs/kubernetes.md)
 - [Test using Docker](docs/docker.md)
 - [API documentations](docs/api.md)
