@@ -2,6 +2,7 @@
 !.gitignore
 !.travis.yml
 !.tekton
+!.github
 .tekton/pipeline-run-*
 coverage.out
 images/
