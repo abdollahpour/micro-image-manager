@@ -7,8 +7,6 @@ COPY go.mod .
 COPY go.sum .
 COPY Makefile .
 
-RUN go get github.com/mattn/goveralls
-
 COPY internal internal/
 COPY cmd cmd/
 

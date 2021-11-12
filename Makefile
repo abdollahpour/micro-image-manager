@@ -19,7 +19,7 @@ run:
 	go run cmd/server/main.go
 
 get:
-	go get -d -u ./...
+	go mod download
 
 image:
 	docker build --pull \

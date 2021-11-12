@@ -34,20 +34,6 @@ func (m *mockImageStorage) Fetch(id string, profile model.Profile, format model.
 	return "", nil
 }
 
-func TestStoreHandlerNoSupport404(t *testing.T) {
-	imageProcessor := processor.NewBimgProcessor(os.TempDir())
-	imageStorage := storage.NewLocalStorage(os.TempDir())
-
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(StoreHandler(imageProcessor, imageStorage))
-
-	req, err := http.NewRequest("GET", "/api/v1/images", nil)
-	assert.Nil(t, err)
-	handler.ServeHTTP(rr, req)
-
-	assert.Equal(t, http.StatusMethodNotAllowed, rr.Result().StatusCode)
-}
-
 func TestStoreHandler(t *testing.T) {
 	_, filename, _, _ := runtime.Caller(0)
 	filePath := strings.Replace(filename, ".go", ".jpeg", 1)
