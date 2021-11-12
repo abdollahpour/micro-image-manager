@@ -1,31 +1,9 @@
-name: Release Charts
-
+name: Release
 on:
-  push:
-    branches:
-      - main
-
+  create:
+    tags:
+      - "*"
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    container:
-      image: abdollahpour/go-libvip:1.17
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-      - name: Install dependencies
-        run: |
-          go mod download
-      - name: Run Unit tests
-        run: |
-          go test -race -covermode atomic -coverprofile=covprofile ./...
-      - name: Install goveralls
-        run: go install github.com/mattn/goveralls@latest
-      - name: Send coverage
-        env:
-          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: goveralls -coverprofile=covprofile -service=github
-
   release:
     runs-on: ubuntu-latest
     steps:
@@ -34,7 +12,6 @@ jobs:
       - name: Set Env
         run: |
           echo "BUILD_TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
-          echo "BUILD_SHA=${GITHUB_SHA:0:7}" >> $GITHUB_ENV
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -50,6 +27,8 @@ jobs:
           context: .
           file: docker/Dockerfile
           push: true
+          build-args: |
+            APP_VERSION=${{ env.BUILD_TAG }}
           tags: |
-            abdollahpour/micro-image-manager:${{ env.BUILD_SHA }}
+            abdollahpour/micro-image-manager:${{ env.BUILD_TAG }}
             abdollahpour/micro-image-manager:latest
