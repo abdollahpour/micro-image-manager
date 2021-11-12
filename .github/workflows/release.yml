@@ -51,5 +51,5 @@ jobs:
           file: docker/Dockerfile
           push: true
           tags: |
-            abdollahpour/go-libvip:${{ env.BUILD_SHA }}
-            abdollahpour/go-libvip:latest
+            abdollahpour/micro-image-manager:${{ env.BUILD_SHA }}
+            abdollahpour/micro-image-manager:latest
