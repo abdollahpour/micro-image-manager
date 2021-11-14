@@ -7,19 +7,11 @@ RUN apt-get install -y zip
 
 COPY go.mod .
 COPY go.sum .
+COPY Makefile .
 
-RUN go mod download
+RUN make get
 
 COPY internal internal/
 COPY cmd cmd/
 
-RUN for i in darwin linux windows ; do \
-    GOOS=linux go build \
-    -a -installsuffix cgo \
-    -ldflags="-X 'main.Version=${APP_VERSION}'" \
-    -o /release/mim-"${i}"-amd64 cmd/server/main.go; \
-    done
-RUN for i in darwin linux windows ; do \
-    zip -j "/release/mim-${i}-amd64.zip" "/release/mim-${i}-amd64" -x "*.DS_Store"; \
-    zip "/release/mim-${i}-amd64.zip" -r templates; \
-    done
+CMD make compile_in_docker archive_in_docker
