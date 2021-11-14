@@ -5,7 +5,10 @@ VIPS_VERSION:=8.10.0
 
 compile:
 	for i in darwin linux windows ; do \
-		GOOS="$${i}" GOARCH=amd64 go build -o bin/mim-"$${i}"-amd64 cmd/server/main.go; \
+		GOOS=$${i} GOARCH=amd64 go build \
+  			-a -installsuffix cgo \
+  			-ldflags="-X 'main.Version=${APP_VERSION}'" \
+  			-o /usr/local/bin/mim-server cmd/server/main.go \
 	done
 
 archive:
