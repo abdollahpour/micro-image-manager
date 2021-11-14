@@ -1,0 +1,25 @@
+FROM abdollahpour/go-libvip:1.17
+ARG APP_VERSION=edge
+
+WORKDIR ${GOPATH}/src/github.com/abdollahpour/micro-image-manager
+
+RUN apt-get install -y zip
+
+COPY go.mod .
+COPY go.sum .
+
+RUN go mod download
+
+COPY internal internal/
+COPY cmd cmd/
+
+RUN for i in darwin linux windows ; do \
+    GOOS=linux go build \
+    -a -installsuffix cgo \
+    -ldflags="-X 'main.Version=${APP_VERSION}'" \
+    -o /release/mim-"${i}"-amd64 cmd/server/main.go; \
+    done
+RUN for i in darwin linux windows ; do \
+    zip -j "/release/mim-${i}-amd64.zip" "/release/mim-${i}-amd64" -x "*.DS_Store"; \
+    zip "/release/mim-${i}-amd64.zip" -r templates; \
+    done

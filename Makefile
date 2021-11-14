@@ -3,20 +3,10 @@ GOLANG_VERSION:=1.16
 DOCKER_IMAGE:=abdollahpour/micro-image-manager
 VIPS_VERSION:=8.10.0
 
-compile:
-	for i in darwin linux windows ; do \
-		GOOS=$${i} GOARCH=amd64 go build \
-  			-a -installsuffix cgo \
-  			-ldflags="-X 'main.Version=${APP_VERSION}'" \
-  			-o /usr/local/bin/mim-server cmd/server/main.go \
-	done
-
-archive:
-	rm -f bin/*.zip
-	for i in darwin linux windows ; do \
-		zip -j "bin/mpg-$${i}-amd64.zip" "bin/mpg-$${i}-amd64" -x "*.DS_Store"; \
-		zip "bin/mpg-$${i}-amd64.zip" -r templates; \
-	done
+release:
+	mkdir -p bin
+	rm -rf bin/*
+	docker run -v $${PWD}:/release --rm -it $$(docker build --no-cache --build-arg APP_VERSION=$(VIPS_VERSION) -q -f docker/Dockerfile-release .)
 
 run:
 	go run cmd/server/main.go
