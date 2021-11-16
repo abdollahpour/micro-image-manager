@@ -10,7 +10,7 @@ micro-image-manager helps to do that simply in an elegant way. You can have imag
 
 Let's see and example. You need an image. Run the server and then:
 
-    curl -F profile_small=400x300 -F profile_large=800x600 -F image=@my_image.jpg http://localhost:8080/api/v1/images
+    curl -F profile_small=400x300 -F profile_large=800x600 -F image=@my_image.jpg https://micro-image-manager.abdollahpour.com/api/v1/images
 
 This will return something like (different ID):
 
@@ -49,7 +49,8 @@ Please check HTML5 documentation for all possible combinations.
 # More documents
 
 - [Architecture](docs/architecture.md)
-- [Run using Kubernetes](docs/kubernetes.md)
+- [Install using Helm chart](https://github.com/abdollahpour/helm-charts/tree/main/charts/micro-image-manager)
+- [Install using Kubernetes (yaml)](docs/kubernetes.md)
 - [Test using Docker](docs/docker.md)
 - [API documentations](docs/api.md)
 
