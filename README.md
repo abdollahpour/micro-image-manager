@@ -5,10 +5,12 @@
 
 # micro-image-manager
 
-One of the biggest challenges to manage media in microservices is distributing them. It's hard to find out how is responsible to store, optimizing, and distribute them. Also, it's hard to implement and it brings a load of dependencies into your service.
-micro-image-manager helps to do that simply in an elegant way. You can have images optimized in different format and sizes with a simple HTTP call.
+micro-image-manager is a super-fast microservice written in Go for optimizing, managing, and hosting images in your distributed applications.
+You can process and host images in different formats (jpeg, gif, png & webp) and sizes. There's no need for any configuration and setting. The setup procedure could be as easy as running a single command (using Helm).
 
-Let's see and example. You need an image. Run the server and then:
+# Example
+
+Use management endpoint to upload/add a new image. Ex:
 
     curl -F profile_small=400x300 -F profile_large=800x600 -F image=@my_image.jpg https://micro-image-manager.abdollahpour.com/api/v1/images
 
@@ -34,29 +36,21 @@ This will return something like (different ID):
 You can use HTML5 to host your images, fast and efficiently:
 
     <picture>
-        <source srcset="//localhost:8080/image/5f4a459d28317a9f153c211d.webp" type="image/webp" />
-        <img src="//localhost:8080/image/5f4a459d28317a9f153c211d.jpeg" alt="Alt Text!" />
+        <source srcset="//micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.webp?profile=large 800w
+                        //micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.webp?profile=small 400w"
+                        type="image/webp" />
+        <source srcset="//micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.jpeg?profile=large 800w
+                        //micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.jpeg?profile=small 400w"
+                        type="image/webp" />
+        <img src="//micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.jpeg" />
     </picture>
-
-Or even optimize the image for different screen sizes that can boost up performance on mobile phones:
-
-    <img src="//localhost:8080/image/5f4a459d28317a9f153c211d.webp?profile=small"
-    srcset="//localhost:8080/image/5f4a459d28317a9f153c211d.webp?profile=large 800w"
-    alt="Image description">
 
 Please check HTML5 documentation for all possible combinations.
 
 # More documents
 
+- [Install on Kubernetes (Helm)](https://github.com/abdollahpour/helm-charts/tree/main/charts/micro-image-manager)
+- [Install on Kubernetes (yaml)](docs/kubernetes.md)
+- [Run using Docker](docs/docker.md)
 - [Architecture](docs/architecture.md)
-- [Install using Helm chart](https://github.com/abdollahpour/helm-charts/tree/main/charts/micro-image-manager)
-- [Install using Kubernetes (yaml)](docs/kubernetes.md)
-- [Test using Docker](docs/docker.md)
 - [API documentations](docs/api.md)
-
-# Use helm for kubernetes
-
-    helm repo add micro-image-manager https://raw.githubusercontent.com/abdollahpour/micro-auth-request-chart/master/repository
-    helm install micro-auth-request
-
-For more information and customization please check the details [here](https://github.com/abdollahpour/micro-image-manager-chart).
