@@ -16,36 +16,46 @@ Use management endpoint to upload/add a new image. Ex:
 
 This will return something like (different ID):
 
+```json
+{
+  "id": "5f4a459d28317a9f153c211d",
+  "profiles": [
     {
-        "id": "5f4a459d28317a9f153c211d",
-        "profiles": [
-            {
-                "name": "small",
-                "width": 400,
-                "height": 300
-            },
-            {
-                "name": "large",
-                "width": 800,
-                "height": 600
-            }
-        ],
-        "formats": ["jpeg", "webp"]
+      "name": "small",
+      "width": 400,
+      "height": 300
+    },
+    {
+      "name": "large",
+      "width": 800,
+      "height": 600
     }
+  ],
+  "formats": ["jpeg", "webp"]
+}
+```
 
 You can use HTML5 to host your images, fast and efficiently:
 
-    <picture>
-        <source srcset="//micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.webp?profile=large 800w
-                        //micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.webp?profile=small 400w"
-                        type="image/webp" />
-        <source srcset="//micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.jpeg?profile=large 800w
-                        //micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.jpeg?profile=small 400w"
-                        type="image/webp" />
-        <img src="//micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.jpeg" />
-    </picture>
+```html
+<picture>
+  <source
+    srcset="//micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.webp?profile=large 800w
+                    //micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.webp?profile=small 400w"
+    type="image/webp"
+  />
+  <source
+    srcset="//micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.jpeg?profile=large 800w
+                    //micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.jpeg?profile=small 400w"
+    type="image/webp"
+  />
+  <img
+    src="//micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.jpeg"
+  />
+</picture>
+```
 
-Please check HTML5 documentation for all possible combinations.
+This help browser choose right format and size based on device. It can significantly increase performance of your website. For more information please check html file picture tag.
 
 # More documents
 
