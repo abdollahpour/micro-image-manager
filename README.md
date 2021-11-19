@@ -39,19 +39,13 @@ You can use HTML5 to host your images, fast and efficiently:
 
 ```html
 <picture>
-  <source
+  <source type="image/webp"
     srcset="//micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.webp?profile=large 800w
-                    //micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.webp?profile=small 400w"
-    type="image/webp"
-  />
-  <source
+            //micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.webp?profile=small 400w"/>
+  <source type="image/jpeg"
     srcset="//micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.jpeg?profile=large 800w
-                    //micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.jpeg?profile=small 400w"
-    type="image/webp"
-  />
-  <img
-    src="//micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.jpeg"
-  />
+            //micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.jpeg?profile=small 400w"/>
+  <img src="//micro-image-manager.abdollahpour.com/image/5f4a459d28317a9f153c211d.jpeg"/>
 </picture>
 ```
 
